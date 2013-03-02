@@ -1,4 +1,5 @@
 #include "SDL.h"
+#include "SDL_image.h"
 #include <string>
 
 const int SCREEN_WIDTH = 640;
@@ -43,7 +44,7 @@ void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination 
 	SDL_BlitSurface( source, NULL, destination, &offset );
 }
 
-int main(int argc, char** argv)
+int main(int arg, char** argv)
 {
 	if ( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
 	{
@@ -87,28 +88,4 @@ int main(int argc, char** argv)
 	SDL_Quit();
 
 	return 0;
-	/*
-	SDL_Surface* hello = NULL;
-	SDL_Surface* screen = NULL;
-
-	SDL_Init( SDL_INIT_EVERYTHING );
-
-	screen = SDL_SetVideoMode( 640, 480, 32, SDL_SWSURFACE );
-
-	hello = SDL_LoadBMP( "hello.bmp" );
-
-	SDL_BlitSurface( hello, NULL, screen, NULL );
-
-	SDL_Flip( screen );
-
-	SDL_Delay( 2000 );
-
-	SDL_FreeSurface( hello );
-
-	SDL_Quit();
-
-	return 0;
-	*/
-
-
 }
