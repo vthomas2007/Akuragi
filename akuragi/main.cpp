@@ -6,9 +6,10 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
-SDL_Surface *message = NULL;
-SDL_Surface *background = NULL;
+SDL_Surface *image = NULL;
 SDL_Surface *screen = NULL;
+
+SDL_Event my_event;
 
 SDL_Surface *load_image( std::string filename )
 {
@@ -19,7 +20,7 @@ SDL_Surface *load_image( std::string filename )
 	SDL_Surface* optimizedImage = NULL;
 
 	// Load the image
-	loadedImage = SDL_LoadBMP( filename.c_str() );
+	loadedImage = IMG_Load( filename.c_str() );
 
 	if (loadedImage != NULL)
 	{
@@ -44,48 +45,79 @@ void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination 
 	SDL_BlitSurface( source, NULL, destination, &offset );
 }
 
-int main(int arg, char** argv)
+bool init()
 {
+	// Initialize all SDL subsystems
 	if ( SDL_Init( SDL_INIT_EVERYTHING ) == -1 )
 	{
-		return 1;
+		return false;
 	}
 
 	// Set up the screen
 	screen = SDL_SetVideoMode( SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_BPP, SDL_SWSURFACE );
 	if ( screen == NULL )
 	{
-		return 1;
+		return false;
 	}
 
 	// Set the window caption
-	SDL_WM_SetCaption( "Hello World", NULL );
+	SDL_WM_SetCaption( "Event test", NULL );
 
-	// Load the images
-	message = load_image( "hello.bmp" );
-	background = load_image( "background.bmp" );
+	return true;
+}
 
-	apply_surface( 0, 0, background, screen );
-	apply_surface( 320, 0, background, screen );
-	apply_surface( 0, 240, background, screen );
-	apply_surface( 320, 240, background, screen );
+bool load_files()
+{
+	// Load the image
+	image = load_image( "x.png" );
 
-	apply_surface( 180, 140, message, screen );
+	if ( image == NULL )
+	{
+		return false;
+	}
 
+	return true;
+}
 
-	// Update the screen
+void clean_up()
+{
+	SDL_FreeSurface( image );
+	SDL_Quit();
+}
+
+int main(int arg, char** argv)
+{
+	bool quit = false;
+
+	if ( init() == false )
+	{
+		return 1;
+	}
+
+	if ( load_files() == false )
+	{
+		return 1;
+	}
+
+	apply_surface( 0, 0, image, screen );
+
 	if ( SDL_Flip( screen ) == -1 )
 	{
 		return 1;
 	}
 
-	// Wait 2 seconds
-	SDL_Delay( 2000 );
+	while ( quit == false )
+	{
+		while ( SDL_PollEvent( &my_event ) )
+		{
+			if ( my_event.type == SDL_QUIT )
+			{
+				quit = true;
+			}
+		}
+	}
 
-	SDL_FreeSurface( message );
-	SDL_FreeSurface( background );
-
-	SDL_Quit();
+	clean_up();
 
 	return 0;
 }
