@@ -2,6 +2,7 @@
 #include "SDL_image.h"
 #include "SDL_ttf.h"
 #include <string>
+#include <sstream>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -12,10 +13,8 @@ SDL_Surface *background = NULL;
 SDL_Surface *message = NULL;
 SDL_Surface *screen = NULL;
 
-SDL_Surface *up = NULL;
-SDL_Surface *down = NULL;
-SDL_Surface *left = NULL;
-SDL_Surface *right = NULL;
+SDL_Surface *seconds = NULL;
+SDL_Surface *startStop = NULL;
 
 SDL_Event my_event;
 
@@ -99,7 +98,7 @@ bool load_files()
 	// Load the image
 	background = load_image( "background.png" );
 
-	font = TTF_OpenFont( "lazy.ttf", 72 );
+	font = TTF_OpenFont( "lazy.ttf", 36 );
 
 	if ( background == NULL || font == NULL )
 	{
@@ -114,10 +113,7 @@ void clean_up()
 	SDL_FreeSurface( background );
 	SDL_FreeSurface( message );
 
-	SDL_FreeSurface( up );
-	SDL_FreeSurface( down );
-	SDL_FreeSurface( left );
-	SDL_FreeSurface( right );
+	SDL_FreeSurface( startStop );
 
 	TTF_CloseFont( font );
 	TTF_Quit();
@@ -129,6 +125,13 @@ int main(int arg, char** argv)
 {
 	bool quit = false;
 
+	// The timer starting time
+	Uint32 start = 0;
+
+	// The timer start/stop flag
+	bool running = true;
+
+
 	if ( init() == false )
 	{
 		return 1;
@@ -139,11 +142,10 @@ int main(int arg, char** argv)
 		return 1;
 	}
 
-	//Render the text
-    up = TTF_RenderText_Solid( font, "Up", textColor );
-    down = TTF_RenderText_Solid( font, "Down", textColor );
-    left = TTF_RenderText_Solid( font, "Left", textColor );
-    right = TTF_RenderText_Solid( font, "Right", textColor );
+	// Start the timer
+	start = SDL_GetTicks();
+
+	startStop = TTF_RenderText_Solid( font, "Press S to start or stop the timer", textColor );
 
 	if ( SDL_Flip( screen ) == -1 )
 	{
@@ -155,42 +157,56 @@ int main(int arg, char** argv)
 		// While there are events to handle
 		while ( SDL_PollEvent( &my_event ) )
 		{
-			if ( my_event.type == SDL_QUIT )
+			// If a key was pressed
+			if ( my_event.type == SDL_KEYDOWN )
+			{
+				// If 's' was pressed
+				if ( my_event.key.keysym.sym == SDLK_s )
+				{
+					// If the timer is running
+					if ( running )
+					{
+						// Stop the timer
+						running = false;
+						start = 0;
+					}
+					else
+					{
+						// Start the timer
+						running = true;
+						start = SDL_GetTicks();
+					}
+				}
+			}
+			else if ( my_event.type == SDL_QUIT )
 			{
 				quit = true;
 			}
 		}
 
-		// Apply the background
 		apply_surface( 0, 0, background, screen );
 
-		// Get the keystates
-		Uint8 *keystates = SDL_GetKeyState( NULL );
+		apply_surface( (SCREEN_WIDTH - startStop->w ) / 2, 200, startStop, screen );
 
-		// If up is pressed
-		if ( keystates[ SDLK_UP ] )
+		// If the timer is running
+		if ( running )
 		{
-			apply_surface( ( SCREEN_WIDTH - up->w) / 2, ( SCREEN_HEIGHT / 2 - up->h), up, screen );
+			// The timer's time as a string
+			std::stringstream time;
+
+			// Convert the timer's time to a string
+			time << "Timer: " << SDL_GetTicks() - start;
+
+			// Render the time surface
+			seconds = TTF_RenderText_Solid( font, time.str().c_str(), textColor );
+
+			// Apply the time surface
+			apply_surface( ( SCREEN_WIDTH - seconds->w ) / 2, 50, seconds, screen );
+
+			// Free the time surface
+			SDL_FreeSurface( seconds );
 		}
 
-		//If down is pressed
-        if( keystates[ SDLK_DOWN ] )
-        {
-            apply_surface( ( SCREEN_WIDTH - down->w ) / 2, ( SCREEN_HEIGHT / 2 - down->h ) / 2 + ( SCREEN_HEIGHT / 2 ), down, screen );
-        }
-    
-        //If left is pressed
-        if( keystates[ SDLK_LEFT ] )
-        {
-            apply_surface( ( SCREEN_WIDTH / 2 - left->w ) / 2, ( SCREEN_HEIGHT - left->h ) / 2, left, screen );
-        }
-    
-        //If right is pressed
-        if( keystates[ SDLK_RIGHT ] )
-        {
-            apply_surface( ( SCREEN_WIDTH / 2 - right->w ) / 2 + ( SCREEN_WIDTH / 2 ), ( SCREEN_HEIGHT - right->h ) / 2, right, screen );
-        }
-		
         //Update the screen
         if( SDL_Flip( screen ) == -1 )
         {
