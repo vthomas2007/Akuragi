@@ -7,20 +7,163 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
+
 SDL_Surface *background = NULL;
 SDL_Surface *message = NULL;
 SDL_Surface *screen = NULL;
-
-SDL_Surface *upMessage = NULL;
-SDL_Surface *downMessage = NULL;
-SDL_Surface *leftMessage = NULL;
-SDL_Surface *rightMessage = NULL;
 
 SDL_Event my_event;
 
 TTF_Font *font = NULL;
 
 SDL_Color textColor = { 255, 255, 255 };
+
+SDL_Surface *buttonSheet = NULL;
+const int CLIP_MOUSEOVER = 0;
+const int CLIP_MOUSEOUT = 1;
+const int CLIP_MOUSEDOWN = 2;
+const int CLIP_MOUSEUP = 3;
+
+SDL_Rect clips[4];
+
+void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL )
+{
+	// Make a temporary rectangle to hold the offsets and assign their values
+	SDL_Rect offset;
+	offset.x = x;
+	offset.y = y;
+
+	// Blit the surface
+	SDL_BlitSurface( source, clip, destination, &offset );
+}
+
+// The button
+class Button
+{
+	private:
+	// The attributes of the button
+	SDL_Rect box;
+
+	// The part of the button that will be shown
+	SDL_Rect *clip;
+
+	public:
+	// Initialize the variables
+	Button( int x, int y, int w, int h );
+
+	// Handle events and set sprite region
+	void handle_events();
+
+	// Shows the button on the screen
+	void show();
+};
+
+
+Button::Button( int x, int y, int w, int h )
+{
+	// Set the button's attributes
+	box.x = x;
+	box.y = y;
+	box.w = w;
+	box.h = h;
+
+	// Set the default sprite
+	clip = &clips[ CLIP_MOUSEOUT ];
+}
+
+void Button::handle_events()
+{
+	// The mouse offsets
+	int x = 0, y = 0;
+
+	// If the mouse moved
+	if ( my_event.type == SDL_MOUSEMOTION )
+	{
+		// Get the mouse offsets
+		x = my_event.motion.x;
+		y = my_event.motion.y;
+
+		// If the mouse is over the button
+		if ( ( x > box.x ) && ( x < box.x + box.w ) && ( y > box.y ) && ( y < box.y + box.h ) )
+		{
+			// Set the button sprite
+			clip = &clips[ CLIP_MOUSEOVER ];
+		}
+		else
+		{
+			clip = &clips[ CLIP_MOUSEOUT ];
+		}
+	}
+
+	// If a mouse button was pressed
+	if ( my_event.type == SDL_MOUSEBUTTONDOWN )
+	{
+		// If the left mouse button was pressed
+		if ( my_event.button.button == SDL_BUTTON_LEFT )
+		{
+			// Get the mouse offsets
+			x = my_event.button.x;
+			y = my_event.button.y;
+
+			// If the mouse is over the button
+			if( ( x > box.x ) && ( x < box.x + box.w ) && ( y > box.y ) && ( y < box.y + box.h ) )
+			{
+				// Set the button sprite
+				clip = &clips[ CLIP_MOUSEDOWN ];
+			}
+		}
+	}
+
+	// If a mouse button was released
+	if ( my_event.type == SDL_MOUSEBUTTONUP )
+	{
+		// If the left mouse button was released
+		if ( my_event.button.button == SDL_BUTTON_LEFT )
+		{
+			// Get the mouse offsets
+			x = my_event.button.x;
+			y = my_event.button.y;
+
+			// If the mouse is over the button
+			if( ( x > box.x ) && ( x < box.x + box.w ) && ( y > box.y ) && ( y < box.y + box.h ) )
+			{
+				// Set the button sprite
+				clip = &clips[ CLIP_MOUSEUP ];
+			}
+		}
+	}
+}
+
+void Button::show()
+{
+	// Show the button
+	apply_surface( box.x, box.y, buttonSheet, screen, clip );
+}
+
+
+void set_clips()
+{
+	// Clpi the sprite sheet
+	clips[ CLIP_MOUSEOVER ].x = 0;
+    clips[ CLIP_MOUSEOVER ].y = 0;
+    clips[ CLIP_MOUSEOVER ].w = 320;
+    clips[ CLIP_MOUSEOVER ].h = 240;
+
+    clips[ CLIP_MOUSEOUT ].x = 320;
+    clips[ CLIP_MOUSEOUT ].y = 0;
+    clips[ CLIP_MOUSEOUT ].w = 320;
+    clips[ CLIP_MOUSEOUT ].h = 240;
+
+    clips[ CLIP_MOUSEDOWN ].x = 0;
+    clips[ CLIP_MOUSEDOWN ].y = 240;
+    clips[ CLIP_MOUSEDOWN ].w = 320;
+    clips[ CLIP_MOUSEDOWN ].h = 240;
+    
+    clips[ CLIP_MOUSEUP ].x = 320;
+    clips[ CLIP_MOUSEUP ].y = 240;
+    clips[ CLIP_MOUSEUP ].w = 320;
+    clips[ CLIP_MOUSEUP ].h = 240;
+}
 
 SDL_Surface *load_image( std::string filename )
 {
@@ -55,17 +198,6 @@ SDL_Surface *load_image( std::string filename )
 	}
 }
 
-void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL )
-{
-	// Make a temporary rectangle to hold the offsets and assign their values
-	SDL_Rect offset;
-	offset.x = x;
-	offset.y = y;
-
-	// Blit the surface
-	SDL_BlitSurface( source, clip, destination, &offset );
-}
-
 bool init()
 {
 	// Initialize all SDL subsystems
@@ -97,6 +229,7 @@ bool load_files()
 {
 	// Load the image
 	background = load_image( "background.png" );
+	buttonSheet = load_image( "button.png" );
 
 	font = TTF_OpenFont( "lazy.ttf", 28 );
 
@@ -112,6 +245,7 @@ void clean_up()
 {
 	SDL_FreeSurface( background );
 	SDL_FreeSurface( message );
+	SDL_FreeSurface( buttonSheet );
 
 	TTF_CloseFont( font );
 	TTF_Quit();
@@ -133,18 +267,11 @@ int main(int arg, char** argv)
 		return 1;
 	}
 
-	// Generage the message surfaces
-	upMessage = TTF_RenderText_Solid( font, "Up was pressed.", textColor );
-	downMessage = TTF_RenderText_Solid( font, "Down was pressed.", textColor );
-    leftMessage = TTF_RenderText_Solid( font, "Left was pressed", textColor );
-    rightMessage = TTF_RenderText_Solid( font, "Right was pressed", textColor );
+	// Clip the sprite sheet
+	set_clips();
 
-	if ( upMessage == NULL || downMessage == NULL || leftMessage == NULL || rightMessage == NULL )
-	{
-		return 1;
-	}
-
-	
+	// Make the button
+	Button myButton( 170, 120, 320, 240 );
 
 	if ( SDL_Flip( screen ) == -1 )
 	{
@@ -153,34 +280,21 @@ int main(int arg, char** argv)
 
 	while ( quit == false )
 	{
-		while ( SDL_PollEvent( &my_event ) )
+		if ( SDL_PollEvent( &my_event ) )
 		{
-			if ( my_event.type == SDL_KEYDOWN ) 
-			{
-				switch ( my_event.key.keysym.sym )
-				{
-					case SDLK_UP: message = upMessage; break;
-					case SDLK_DOWN: message = downMessage; break;
-					case SDLK_LEFT: message = leftMessage; break;
-					case SDLK_RIGHT: message = rightMessage; break;
-				}
-			}
-			else if ( my_event.type == SDL_QUIT )
+			myButton.handle_events();
+
+			if ( my_event.type == SDL_QUIT )
 			{
 				quit = true;
 			}
 		}
 
-		// If a message needs to be displayed
-		if ( message != NULL )
-		{
-			// Apply the images to the screen
-			apply_surface( 0, 0, background, screen );
-			apply_surface( ( SCREEN_WIDTH - message->w ) / 2, ( SCREEN_HEIGHT - message->h ) / 2, message, screen );
+		// Fill the screen white
+		SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
 
-			// Null the surface pointer
-			message = NULL;
-		}
+		// Show the button
+		myButton.show();
 
 		// Update the screen
 		if ( SDL_Flip( screen ) == -1 )
