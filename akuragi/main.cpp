@@ -1,17 +1,26 @@
 #include "SDL.h"
 #include "SDL_image.h"
+#include "SDL_ttf.h"
 #include <string>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
-SDL_Surface *dots = NULL;
+SDL_Surface *background = NULL;
+SDL_Surface *message = NULL;
 SDL_Surface *screen = NULL;
+
+SDL_Surface *upMessage = NULL;
+SDL_Surface *downMessage = NULL;
+SDL_Surface *leftMessage = NULL;
+SDL_Surface *rightMessage = NULL;
 
 SDL_Event my_event;
 
-SDL_Rect clip[4];
+TTF_Font *font = NULL;
+
+SDL_Color textColor = { 255, 255, 255 };
 
 SDL_Surface *load_image( std::string filename )
 {
@@ -72,6 +81,12 @@ bool init()
 		return false;
 	}
 
+	// Initialize SDL_ttf
+	if ( TTF_Init() == -1 )
+	{
+		return false;
+	}
+
 	// Set the window caption
 	SDL_WM_SetCaption( "Event test", NULL );
 
@@ -81,9 +96,11 @@ bool init()
 bool load_files()
 {
 	// Load the image
-	dots = load_image( "dots.png" );
+	background = load_image( "background.png" );
 
-	if ( dots == NULL )
+	font = TTF_OpenFont( "lazy.ttf", 28 );
+
+	if ( background == NULL || font == NULL )
 	{
 		return false;
 	}
@@ -93,7 +110,12 @@ bool load_files()
 
 void clean_up()
 {
-	SDL_FreeSurface( dots );
+	SDL_FreeSurface( background );
+	SDL_FreeSurface( message );
+
+	TTF_CloseFont( font );
+	TTF_Quit();
+
 	SDL_Quit();
 }
 
@@ -111,38 +133,18 @@ int main(int arg, char** argv)
 		return 1;
 	}
 
-	//Clip range for the top left
-    clip[ 0 ].x = 0;
-    clip[ 0 ].y = 0;
-    clip[ 0 ].w = 100;
-    clip[ 0 ].h = 100;
-    
-    //Clip range for the top right
-    clip[ 1 ].x = 100;
-    clip[ 1 ].y = 0;
-    clip[ 1 ].w = 100;
-    clip[ 1 ].h = 100;
-    
-    //Clip range for the bottom left
-    clip[ 2 ].x = 0;
-    clip[ 2 ].y = 100;
-    clip[ 2 ].w = 100;
-    clip[ 2 ].h = 100;
-    
-    //Clip range for the bottom right
-    clip[ 3 ].x = 100;
-    clip[ 3 ].y = 100;
-    clip[ 3 ].w = 100;
-    clip[ 3 ].h = 100;
+	// Generage the message surfaces
+	upMessage = TTF_RenderText_Solid( font, "Up was pressed.", textColor );
+	downMessage = TTF_RenderText_Solid( font, "Down was pressed.", textColor );
+    leftMessage = TTF_RenderText_Solid( font, "Left was pressed", textColor );
+    rightMessage = TTF_RenderText_Solid( font, "Right was pressed", textColor );
 
-	// Fill the screen white
-	SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
+	if ( upMessage == NULL || downMessage == NULL || leftMessage == NULL || rightMessage == NULL )
+	{
+		return 1;
+	}
 
-	// Add the images to the screen
-	apply_surface( 0, 0, dots, screen, &clip[0] );
-	apply_surface( 540, 0, dots, screen, &clip[1] );
-	apply_surface( 0, 380, dots, screen, &clip[2] );
-	apply_surface( 540, 380, dots, screen, &clip[3] );
+	
 
 	if ( SDL_Flip( screen ) == -1 )
 	{
@@ -153,10 +155,37 @@ int main(int arg, char** argv)
 	{
 		while ( SDL_PollEvent( &my_event ) )
 		{
-			if ( my_event.type == SDL_QUIT )
+			if ( my_event.type == SDL_KEYDOWN ) 
+			{
+				switch ( my_event.key.keysym.sym )
+				{
+					case SDLK_UP: message = upMessage; break;
+					case SDLK_DOWN: message = downMessage; break;
+					case SDLK_LEFT: message = leftMessage; break;
+					case SDLK_RIGHT: message = rightMessage; break;
+				}
+			}
+			else if ( my_event.type == SDL_QUIT )
 			{
 				quit = true;
 			}
+		}
+
+		// If a message needs to be displayed
+		if ( message != NULL )
+		{
+			// Apply the images to the screen
+			apply_surface( 0, 0, background, screen );
+			apply_surface( ( SCREEN_WIDTH - message->w ) / 2, ( SCREEN_HEIGHT - message->h ) / 2, message, screen );
+
+			// Null the surface pointer
+			message = NULL;
+		}
+
+		// Update the screen
+		if ( SDL_Flip( screen ) == -1 )
+		{
+			return 1;
 		}
 	}
 
