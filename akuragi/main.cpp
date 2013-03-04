@@ -15,12 +15,116 @@ SDL_Surface *screen = NULL;
 
 SDL_Surface *seconds = NULL;
 SDL_Surface *startStop = NULL;
+SDL_Surface *pauseMessage = NULL;
 
 SDL_Event my_event;
 
 TTF_Font *font = NULL;
 
 SDL_Color textColor = { 0, 0, 0 };
+
+// Timer class
+class Timer
+{
+private:
+	// The clock time when the timer started
+	int startTicks;
+
+	// The ticks stored when the timer is paused
+	int pausedTicks;
+
+	// The timer status
+	bool paused;
+	bool started;
+
+public:
+	Timer();
+
+	// Clock actions
+	void start();
+	void stop();
+	void pause();
+	void unpause();
+
+	// Get the timer's time
+	int get_ticks();
+
+	// Check the status of the timer
+	bool is_started();
+	bool is_paused();
+};
+
+Timer::Timer()
+{
+	startTicks = 0;
+	pausedTicks = 0;
+	paused = false;
+	started = false;
+}
+
+void Timer::start()
+{
+	// Start the timer
+	started = true;
+
+	// Unpause the timer
+	paused = false;
+
+	// Get the current clock time
+	startTicks = SDL_GetTicks();
+}
+
+void Timer::stop()
+{
+	started = false;
+	paused = false;
+}
+
+int Timer::get_ticks()
+{
+	if ( started )
+	{
+		if ( paused )
+		{
+			return pausedTicks;
+		}
+		else
+		{
+			return SDL_GetTicks() - startTicks;
+		}
+	}
+
+	return 0;
+}
+
+void Timer::pause()
+{
+	if ( started && !paused )
+	{
+		paused = true;
+		pausedTicks = SDL_GetTicks() - startTicks;
+	}
+}
+
+void Timer::unpause()
+{
+	if ( paused )
+	{
+		paused = false;
+		startTicks = SDL_GetTicks() - pausedTicks;
+		pausedTicks = 0;
+	}
+}
+
+bool Timer::is_started()
+{
+	return started;
+}
+
+bool Timer::is_paused()
+{
+	return paused;
+}
 
 void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL )
 {
@@ -114,6 +218,7 @@ void clean_up()
 	SDL_FreeSurface( message );
 
 	SDL_FreeSurface( startStop );
+	SDL_FreeSurface( pauseMessage );
 
 	TTF_CloseFont( font );
 	TTF_Quit();
@@ -124,12 +229,6 @@ void clean_up()
 int main(int arg, char** argv)
 {
 	bool quit = false;
-
-	// The timer starting time
-	Uint32 start = 0;
-
-	// The timer start/stop flag
-	bool running = true;
 
 
 	if ( init() == false )
@@ -142,15 +241,20 @@ int main(int arg, char** argv)
 		return 1;
 	}
 
-	// Start the timer
-	start = SDL_GetTicks();
+	// Make the timer
+	Timer myTimer;
 
+	// Generate the message surfaces
 	startStop = TTF_RenderText_Solid( font, "Press S to start or stop the timer", textColor );
+	pauseMessage = TTF_RenderText_Solid( font, "Press P to puase or unpause the timer", textColor );
 
 	if ( SDL_Flip( screen ) == -1 )
 	{
 		return 1;
 	}
+
+	// Start the timer
+	myTimer.start();
 
 	while ( quit == false )
 	{
@@ -164,17 +268,26 @@ int main(int arg, char** argv)
 				if ( my_event.key.keysym.sym == SDLK_s )
 				{
 					// If the timer is running
-					if ( running )
+					if ( myTimer.is_started() )
 					{
-						// Stop the timer
-						running = false;
-						start = 0;
+						myTimer.stop();
 					}
 					else
 					{
-						// Start the timer
-						running = true;
-						start = SDL_GetTicks();
+						myTimer.start();
+					}
+				}
+
+				if ( my_event.key.keysym.sym == SDLK_p )
+				{
+					// If the timer is paused
+					if ( myTimer.is_paused() )
+					{
+						myTimer.unpause();
+					}
+					else
+					{
+						myTimer.pause();
 					}
 				}
 			}
@@ -188,24 +301,21 @@ int main(int arg, char** argv)
 
 		apply_surface( (SCREEN_WIDTH - startStop->w ) / 2, 200, startStop, screen );
 
-		// If the timer is running
-		if ( running )
-		{
-			// The timer's time as a string
-			std::stringstream time;
+		// The timer's time as a string
+		std::stringstream time;
 
-			// Convert the timer's time to a string
-			time << "Timer: " << SDL_GetTicks() - start;
+		// Convert the timer's time to a string
+		time << "Timer: " << myTimer.get_ticks() / 1000.f;
 
-			// Render the time surface
-			seconds = TTF_RenderText_Solid( font, time.str().c_str(), textColor );
+		// Render the time surface
+		seconds = TTF_RenderText_Solid( font, time.str().c_str(), textColor );
 
-			// Apply the time surface
-			apply_surface( ( SCREEN_WIDTH - seconds->w ) / 2, 50, seconds, screen );
+		// Apply the time surface
+		apply_surface( ( SCREEN_WIDTH - seconds->w ) / 2, 50, seconds, screen );
 
-			// Free the time surface
-			SDL_FreeSurface( seconds );
-		}
+		// Free the time surface
+		SDL_FreeSurface( seconds );
+
 
         //Update the screen
         if( SDL_Flip( screen ) == -1 )
