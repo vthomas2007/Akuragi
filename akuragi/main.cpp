@@ -10,8 +10,10 @@ const int SCREEN_BPP = 32;
 
 const int FRAMES_PER_SECOND = 20;
 
-SDL_Surface *background = NULL;
-SDL_Surface *message = NULL;
+const int DOT_WIDTH = 20;
+const int DOT_HEIGHT = 20;
+
+SDL_Surface *dot = NULL;
 SDL_Surface *screen = NULL;
 
 SDL_Event my_event;
@@ -20,7 +22,94 @@ TTF_Font *font = NULL;
 
 SDL_Color textColor = { 0, 0, 0 };
 
-// Timer class
+void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL )
+{
+	// Make a temporary rectangle to hold the offsets and assign their values
+	SDL_Rect offset;
+	offset.x = x;
+	offset.y = y;
+
+	// Blit the surface
+	SDL_BlitSurface( source, clip, destination, &offset );
+}
+
+
+// Dot class ------------------------------------------------------------------
+class Dot
+{
+	private:
+		// The X and Y offsets
+		int x, y;
+
+		// The velocity of the dot
+		int xVel, yVel;
+
+	public:
+		// Ctor
+		Dot();
+
+		void handle_input();
+		void move();
+		void show();
+};
+
+Dot::Dot()
+{
+	x = 0;
+	y = 0;
+	xVel = 0;
+	yVel = 0;
+}
+
+void Dot::handle_input()
+{
+	// If a key was pressed
+	if ( my_event.type == SDL_KEYDOWN )
+	{
+		// Adjust the velocity
+		switch ( my_event.key.keysym.sym )
+		{
+			case SDLK_UP: yVel -= DOT_HEIGHT / 2; break;
+			case SDLK_DOWN: yVel += DOT_HEIGHT / 2; break;
+			case SDLK_LEFT: xVel -= DOT_WIDTH / 2; break;
+			case SDLK_RIGHT: xVel += DOT_WIDTH / 2; break;
+		}
+	}
+	// If a key was released
+	else if ( my_event.type == SDL_KEYUP )
+	{
+		// Adjust the velocity
+		switch ( my_event.key.keysym.sym )
+		{
+			case SDLK_UP: yVel += DOT_HEIGHT / 2; break;
+			case SDLK_DOWN: yVel -= DOT_HEIGHT / 2; break;
+			case SDLK_LEFT: xVel += DOT_WIDTH / 2; break;
+			case SDLK_RIGHT: xVel -= DOT_WIDTH / 2; break;
+		}
+	}
+}
+
+void Dot::move()
+{
+	x += xVel;
+	if ( ( x < 0 ) || ( x + DOT_WIDTH > SCREEN_WIDTH ) )
+	{
+		x -= xVel;
+	}
+
+	y += yVel;
+	if ( ( y < 0 ) || ( y + DOT_HEIGHT > SCREEN_HEIGHT ) )
+	{
+		y -= yVel;
+	}
+}
+
+void Dot::show()
+{
+	apply_surface( x, y, dot, screen );
+}
+
+// Timer class ------------------------------------------------------------------
 class Timer
 {
 private:
@@ -123,17 +212,6 @@ bool Timer::is_paused()
 	return paused;
 }
 
-void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL )
-{
-	// Make a temporary rectangle to hold the offsets and assign their values
-	SDL_Rect offset;
-	offset.x = x;
-	offset.y = y;
-
-	// Blit the surface
-	SDL_BlitSurface( source, clip, destination, &offset );
-}
-
 SDL_Surface *load_image( std::string filename )
 {
 	// Temporary storage for the image that's loaded
@@ -197,11 +275,11 @@ bool init()
 bool load_files()
 {
 	// Load the image
-	background = load_image( "background.png" );
+	dot = load_image( "dot.bmp" );
 
 	font = TTF_OpenFont( "lazy.ttf", 36 );
 
-	if ( background == NULL || font == NULL )
+	if ( dot == NULL || font == NULL )
 	{
 		return false;
 	}
@@ -211,8 +289,7 @@ bool load_files()
 
 void clean_up()
 {
-	SDL_FreeSurface( background );
-	SDL_FreeSurface( message );
+	SDL_FreeSurface( dot );
 
 	TTF_CloseFont( font );
 	TTF_Quit();
@@ -234,12 +311,11 @@ int main(int arg, char** argv)
 		return 1;
 	}
 
+	Dot myDot;
+
 	int frame = 0;
 	bool cap = true;
 	Timer fps;
-
-	// Generate the message surfaces
-	message = TTF_RenderText_Solid( font, "Testing Frame Rate", textColor );
 
 	if ( SDL_Flip( screen ) == -1 )
 	{
@@ -254,26 +330,22 @@ int main(int arg, char** argv)
 		// While there are events to handle
 		while ( SDL_PollEvent( &my_event ) )
 		{
-			// If a key was pressed
-			if ( my_event.type == SDL_KEYDOWN )
-			{
-				// If enter was pressed
-				if ( my_event.key.keysym.sym == SDLK_RETURN )
-				{
-					// Switch cap
-					cap = !cap;
-				}
-			}
-			else if ( my_event.type == SDL_QUIT )
+			myDot.handle_input();
+
+			if ( my_event.type == SDL_QUIT )
 			{
 				quit = true;
 			}
 		}
 
-		apply_surface( 0, 0, background, screen );
+		// Move the dot
+		myDot.move();
 
-		apply_surface( (SCREEN_WIDTH - message->w ) / 2, ( ( SCREEN_HEIGHT + message->h * 2 ) / FRAMES_PER_SECOND ) * ( frame % FRAMES_PER_SECOND ) - message->h, message, screen );
+		// Fill the screen white
+		SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
 
+		// Show the dot on the screen
+		myDot.show();
 
         //Update the screen
         if( SDL_Flip( screen ) == -1 )
