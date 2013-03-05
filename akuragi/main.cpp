@@ -8,14 +8,11 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
+const int FRAMES_PER_SECOND = 20;
 
 SDL_Surface *background = NULL;
 SDL_Surface *message = NULL;
 SDL_Surface *screen = NULL;
-
-SDL_Surface *seconds = NULL;
-SDL_Surface *startStop = NULL;
-SDL_Surface *pauseMessage = NULL;
 
 SDL_Event my_event;
 
@@ -217,9 +214,6 @@ void clean_up()
 	SDL_FreeSurface( background );
 	SDL_FreeSurface( message );
 
-	SDL_FreeSurface( startStop );
-	SDL_FreeSurface( pauseMessage );
-
 	TTF_CloseFont( font );
 	TTF_Quit();
 
@@ -229,7 +223,6 @@ void clean_up()
 int main(int arg, char** argv)
 {
 	bool quit = false;
-
 
 	if ( init() == false )
 	{
@@ -241,54 +234,34 @@ int main(int arg, char** argv)
 		return 1;
 	}
 
-	// Make the timer
-	Timer myTimer;
+	int frame = 0;
+	bool cap = true;
+	Timer fps;
 
 	// Generate the message surfaces
-	startStop = TTF_RenderText_Solid( font, "Press S to start or stop the timer", textColor );
-	pauseMessage = TTF_RenderText_Solid( font, "Press P to puase or unpause the timer", textColor );
+	message = TTF_RenderText_Solid( font, "Testing Frame Rate", textColor );
 
 	if ( SDL_Flip( screen ) == -1 )
 	{
 		return 1;
 	}
 
-	// Start the timer
-	myTimer.start();
-
 	while ( quit == false )
 	{
+		// Start the frame timer
+		fps.start();
+
 		// While there are events to handle
 		while ( SDL_PollEvent( &my_event ) )
 		{
 			// If a key was pressed
 			if ( my_event.type == SDL_KEYDOWN )
 			{
-				// If 's' was pressed
-				if ( my_event.key.keysym.sym == SDLK_s )
+				// If enter was pressed
+				if ( my_event.key.keysym.sym == SDLK_RETURN )
 				{
-					// If the timer is running
-					if ( myTimer.is_started() )
-					{
-						myTimer.stop();
-					}
-					else
-					{
-						myTimer.start();
-					}
-				}
-
-				if ( my_event.key.keysym.sym == SDLK_p )
-				{
-					// If the timer is paused
-					if ( myTimer.is_paused() )
-					{
-						myTimer.unpause();
-					}
-					else
-					{
-						myTimer.pause();
-					}
+					// Switch cap
+					cap = !cap;
 				}
 			}
 			else if ( my_event.type == SDL_QUIT )
@@ -299,22 +272,7 @@ int main(int arg, char** argv)
 
 		apply_surface( 0, 0, background, screen );
 
-		apply_surface( (SCREEN_WIDTH - startStop->w ) / 2, 200, startStop, screen );
-
-		// The timer's time as a string
-		std::stringstream time;
-
-		// Convert the timer's time to a string
-		time << "Timer: " << myTimer.get_ticks() / 1000.f;
-
-		// Render the time surface
-		seconds = TTF_RenderText_Solid( font, time.str().c_str(), textColor );
-
-		// Apply the time surface
-		apply_surface( ( SCREEN_WIDTH - seconds->w ) / 2, 50, seconds, screen );
-
-		// Free the time surface
-		SDL_FreeSurface( seconds );
+		apply_surface( (SCREEN_WIDTH - message->w ) / 2, ( ( SCREEN_HEIGHT + message->h * 2 ) / FRAMES_PER_SECOND ) * ( frame % FRAMES_PER_SECOND ) - message->h, message, screen );
 
 
         //Update the screen
@@ -322,6 +280,15 @@ int main(int arg, char** argv)
         {
             return 1;    
         }
+
+		frame++;
+
+		// Cap the frame rate if necessary
+		if ( cap && fps.get_ticks() < 1000 / FRAMES_PER_SECOND )
+		{
+			// Sleep the remaining frame time
+			SDL_Delay( ( 1000 / FRAMES_PER_SECOND ) - fps.get_ticks() );
+		}
 	}
 
 	clean_up();
