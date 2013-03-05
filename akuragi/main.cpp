@@ -8,11 +8,15 @@ const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 const int SCREEN_BPP = 32;
 
-const int FRAMES_PER_SECOND = 20;
+const int FRAMES_PER_SECOND = 60;
+
+const int SQUARE_WIDTH = 20;
+const int SQUARE_HEIGHT = 20;
 
 const int DOT_WIDTH = 20;
 const int DOT_HEIGHT = 20;
 
+SDL_Surface *square = NULL;
 SDL_Surface *dot = NULL;
 SDL_Surface *screen = NULL;
 
@@ -21,6 +25,9 @@ SDL_Event my_event;
 TTF_Font *font = NULL;
 
 SDL_Color textColor = { 0, 0, 0 };
+
+// The wall
+SDL_Rect wall;
 
 void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL )
 {
@@ -33,6 +40,112 @@ void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination,
 	SDL_BlitSurface( source, clip, destination, &offset );
 }
 
+bool check_collision( SDL_Rect A, SDL_Rect B )
+{
+	// The sides of the rectangles
+	int leftA, leftB;
+	int rightA, rightB;
+	int topA, topB;
+	int bottomA, bottomB;
+
+	// Calculate the sides of rect A
+	leftA = A.x;
+	rightA = A.x + A.w;
+	topA = A.y;
+	bottomA = A.y + A.h;
+
+	// Calculate the sides of rect B
+	leftB = B.x;
+	rightB = B.x + B.w;
+	topB = B.y;
+	bottomB = B.y + B.h;
+
+	if ( bottomA <= topB || topA >= bottomB )
+	{
+		return false;
+	}
+
+	if ( rightA <= leftB || leftA >= rightB )
+	{
+		return false;
+	}
+
+	return true;
+}
+
+// Square class ---------------------------------------------------------------
+class Square {
+private:
+	SDL_Rect box;
+	int xVel, yVel;
+
+public:
+	Square();
+
+	void handle_input();
+	void move();
+	void show();
+};
+
+Square::Square()
+{
+	box.x = 0;
+	box.y = 0;
+
+	box.w = SQUARE_WIDTH;
+	box.h = SQUARE_HEIGHT;
+
+	xVel = 0;
+	yVel = 0;
+}
+
+void Square::move()
+{
+	box.x += xVel;
+	if ( (box.x < 0) || (box.x + SQUARE_WIDTH > SCREEN_WIDTH) || check_collision( box, wall ) )
+	{
+		box.x -= xVel;
+	}
+
+	box.y += yVel;
+	if ( (box.y < 0) || (box.y + SQUARE_HEIGHT > SCREEN_HEIGHT) || check_collision( box, wall ) )
+	{
+		box.y -= yVel;
+	}
+}
+
+void Square::handle_input()
+{
+	// If a key was pressed
+	if ( my_event.type == SDL_KEYDOWN )
+	{
+		// Adjust the velocity
+		switch ( my_event.key.keysym.sym )
+		{
+			case SDLK_UP: yVel -= SQUARE_HEIGHT / 2; break;
+			case SDLK_DOWN: yVel += SQUARE_HEIGHT / 2; break;
+			case SDLK_LEFT: xVel -= SQUARE_WIDTH / 2; break;
+			case SDLK_RIGHT: xVel += SQUARE_WIDTH / 2; break;
+		}
+	}
+	// If a key was released
+	else if ( my_event.type == SDL_KEYUP )
+	{
+		// Adjust the velocity
+		switch ( my_event.key.keysym.sym )
+		{
+			case SDLK_UP: yVel += SQUARE_HEIGHT / 2; break;
+			case SDLK_DOWN: yVel -= SQUARE_HEIGHT / 2; break;
+			case SDLK_LEFT: xVel += SQUARE_WIDTH / 2; break;
+			case SDLK_RIGHT: xVel -= SQUARE_WIDTH / 2; break;
+		}
+	}
+}
+
+void Square::show()
+{
+	apply_surface(box.x, box.y, square, screen);
+}
 
 // Dot class ------------------------------------------------------------------
 class Dot
@@ -275,11 +388,11 @@ bool init()
 bool load_files()
 {
 	// Load the image
-	dot = load_image( "dot.bmp" );
+	square = load_image( "square.bmp" );
 
 	font = TTF_OpenFont( "lazy.ttf", 36 );
 
-	if ( dot == NULL || font == NULL )
+	if ( square == NULL || font == NULL )
 	{
 		return false;
 	}
@@ -289,7 +402,7 @@ bool load_files()
 
 void clean_up()
 {
-	SDL_FreeSurface( dot );
+	SDL_FreeSurface( square );
 
 	TTF_CloseFont( font );
 	TTF_Quit();
@@ -311,7 +424,12 @@ int main(int arg, char** argv)
 		return 1;
 	}
 
-	Dot myDot;
+	Square mySquare;
+
+	wall.x = 300;
+	wall.y = 40;
+	wall.w = 40;
+	wall.h = 400;
 
 	int frame = 0;
 	bool cap = true;
@@ -330,7 +448,7 @@ int main(int arg, char** argv)
 		// While there are events to handle
 		while ( SDL_PollEvent( &my_event ) )
 		{
-			myDot.handle_input();
+			mySquare.handle_input();
 
 			if ( my_event.type == SDL_QUIT )
 			{
@@ -338,14 +456,17 @@ int main(int arg, char** argv)
 			}
 		}
 
-		// Move the dot
-		myDot.move();
+		// Move the square
+		mySquare.move();
 
 		// Fill the screen white
 		SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
 
-		// Show the dot on the screen
-		myDot.show();
+		// Show the wall
+		SDL_FillRect( screen, &wall, SDL_MapRGB( screen->format, 0x77, 0x77, 0x77 ) );
+
+		// Show the square on the screen
+		mySquare.show();
 
         //Update the screen
         if( SDL_Flip( screen ) == -1 )
