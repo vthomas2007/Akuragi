@@ -3,6 +3,8 @@
 #include "SDL_ttf.h"
 
 #include "square.h"
+#include "GameObject.h"
+#include "EnemyManager.h"
 #include "timer.h"
 #include "utility_functions.h"
 #include "constants.h"
@@ -36,14 +38,18 @@ int main(int arg, char** argv)
 	screen = init_screen();
 
 	// This is where "load files" used to be
+	// TODO: Offload all of this to a resource manager
 	square = load_image( "square.bmp" );
+	dot = load_image( "black-circle.png" );
 	font = TTF_OpenFont( "lazy.ttf", 36 );
-	if ( square == NULL || font == NULL )
+	if ( square == NULL || dot == NULL || font == NULL )
 	{
 		return 1;
 	}
 
 	Square mySquare(square);
+	EnemyManager enemyManager( dot, screen );
+	//enemyManager.addEnemy();
 
 	int frame = 0;
 	bool cap = true;
@@ -78,6 +84,9 @@ int main(int arg, char** argv)
 
 		// Show the square on the screen
 		mySquare.show( screen );
+
+		// Update and show the enemies
+		enemyManager.update(frame);
 
         //Update the screen
         if( SDL_Flip( screen ) == -1 )

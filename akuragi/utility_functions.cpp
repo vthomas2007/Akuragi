@@ -1,5 +1,7 @@
 #include "utility_functions.h"
 #include "constants.h"
+#include <cstdlib>
+#include <ctime>
 
 using namespace Akuragi::Constants;
 
@@ -23,6 +25,9 @@ namespace Akuragi
 
 			// Set the window caption
 			SDL_WM_SetCaption( GAME_TITLE.c_str(), NULL );
+
+			// Seed the random number generator
+			srand(time(NULL));
 
 			return true;
 		}

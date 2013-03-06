@@ -69,6 +69,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="dot.cpp" />
+    <ClCompile Include="EnemyManager.cpp" />
+    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="square.cpp" />
     <ClCompile Include="timer.cpp" />
@@ -77,6 +79,7 @@
   <ItemGroup>
     <ClInclude Include="constants.h" />
     <ClInclude Include="dot.h" />
+    <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="square.h" />
     <ClInclude Include="timer.h" />
