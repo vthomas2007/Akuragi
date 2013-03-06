@@ -68,7 +68,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="dot.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="square.cpp" />
+    <ClCompile Include="timer.cpp" />
+    <ClCompile Include="utility_functions.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="constants.h" />
+    <ClInclude Include="dot.h" />
+    <ClInclude Include="GameObject.h" />
+    <ClInclude Include="square.h" />
+    <ClInclude Include="timer.h" />
+    <ClInclude Include="utility_functions.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
