@@ -31,8 +31,9 @@ public:
 	void show(SDL_Surface* dest) const;
 	void move();
 
-	// TODO: Create a subclass for player objects and move this function into it
+	// TODO: Create a subclass for player objects and move these functions into it
 	void handle_input( const SDL_Event& event );
+	SDL_Rect getSpawnBuffer();
 
 protected:
 	SDL_Surface *image;

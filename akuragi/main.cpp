@@ -84,17 +84,27 @@ int main(int arg, char** argv)
 
 		// Move the square
 		player.move();
+		// TODO: Move this functionality to the player class and override cuz this ain't good
+		if ( ( player.getX() < 0 ) || ( player.getX() + player.getImage()->w > SCREEN_WIDTH ) )
+		{
+			player.setX(player.getX() - player.getXVel());
+		}
+
+		if ( ( player.getY() < 0 ) || ( player.getY() + player.getImage()->h > SCREEN_HEIGHT ) )
+		{
+			player.setY(player.getY() - player.getYVel());
+		}
 
 		// Show the square on the screen
 		player.show( screen );
 
 		// Update and show the enemies
-		enemyManager.update(frame);
+		enemyManager.update(frame, &player.getSpawnBuffer());
 
 		// Check for enemy/player collisions
 		if ( check_enemy_player_collisions( enemyManager.getEnemyContainer(), player ) )
 		{
-			break;
+			enemyManager.reset();
 		}
 
         //Update the screen

@@ -42,7 +42,7 @@ void GameObject::move()
 	y += yVel;
 }
 
-// TODO: Create a subclass for the player and move this to it
+// TODO: Create a subclass for the player and move these to it
 void GameObject::handle_input( const SDL_Event& event )
 {
 	// If a key was pressed
@@ -69,6 +69,17 @@ void GameObject::handle_input( const SDL_Event& event )
 			case SDLK_RIGHT: xVel -= image->w / 4; break;
 		}
 	}
+}
+
+SDL_Rect GameObject::getSpawnBuffer()
+{
+	SDL_Rect rect;
+	rect.x = (int)(x + 0.5f);
+	rect.y = (int)(y + 0.5f);
+	rect.w = image->w;
+	rect.h = image->h;
+
+	return rect;
 }
 
 

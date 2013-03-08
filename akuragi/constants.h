@@ -11,5 +11,8 @@ namespace Akuragi
 		const int SCREEN_BPP = 32;
 
 		const int FRAMES_PER_SECOND = 60;
+
+		const int ENEMY_SPAWN_BUFFER_WIDTH = 200;
+		const int ENEMY_SPAWN_BUFFER_HEIGHT = 150;
 	}
 }
