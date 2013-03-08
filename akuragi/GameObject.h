@@ -18,6 +18,7 @@ public:
 	float getYOld() const;
 	float getXVel() const;
 	float getYVel() const;
+	SDL_Surface* getImage() const;
 
 	void setX(float xVal);
 	void setY(float yVal);
@@ -25,9 +26,13 @@ public:
 	void setYOld(float yOldVal);
 	void setXVel(float xVelVal);
 	void setYVel(float yVelVal);
+	void setImage(SDL_Surface* newImage);
 
 	void show(SDL_Surface* dest) const;
 	void move();
+
+	// TODO: Create a subclass for player objects and move this function into it
+	void handle_input( const SDL_Event& event );
 
 protected:
 	SDL_Surface *image;

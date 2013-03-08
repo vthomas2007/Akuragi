@@ -5,6 +5,8 @@
 
 using namespace Akuragi::Constants;
 
+typedef std::vector<GameObject>::const_iterator goIter;
+
 namespace Akuragi
 {
 	namespace UtilFunctions
@@ -98,6 +100,208 @@ namespace Akuragi
 			return true;
 		}
 		*/
+
+		bool check_enemy_player_collisions( const std::vector<GameObject>& enemies, const GameObject& player )
+		{
+			for ( goIter iter = enemies.begin(), end = enemies.end(); iter != end; iter++ )
+			{
+				if ( check_circular_collision( *iter, player ) )
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		bool check_circular_collision( const GameObject& A, const GameObject& B )
+		{
+			//Initialize temporary variables to calculate the "center" of the object... may need to revisit class structure later
+			float AhalfWidth = (float)(A.getImage()->w / 2);
+			float AhalfHeight = (float)(A.getImage()->h / 2);
+			float BhalfWidth = (float)(B.getImage()->w / 2);
+			float BhalfHeight = (float)(B.getImage()->h / 2);
+
+			//Initialize input variables for x positions, y positions, and radii
+			float Aradius = AhalfWidth; // TODO: Make this less fragile
+			float Ax1 = A.getXOld() + AhalfWidth;
+			float Ax2 = A.getX() + AhalfWidth;
+			float Ay1 = A.getYOld() + AhalfHeight;
+			float Ay2 = A.getY() + AhalfHeight;
+			float Bradius = BhalfWidth;
+			float Bx1 = B.getXOld() + BhalfWidth;
+			float Bx2 = B.getX() + BhalfWidth;
+			float By1 = B.getYOld() + BhalfHeight;
+			float By2 = B.getY() + BhalfHeight;
+			float combinedRadius = Aradius + Bradius;
+			/*
+			if (DEBUG) outputFile << std::endl;
+			if (DEBUG) outputFile << "-----------------" << std::endl;
+			if (DEBUG) outputFile << "Ax1: " << Ax1 << " Ay1: " << Ay1 << std::endl;
+			if (DEBUG) outputFile << "Ax2: " << Ax2 << " Ay2: " << Ay2 << std::endl;
+			if (DEBUG) outputFile << "Bx1: " << Bx1 << " By1: " << By1 << std::endl;
+			if (DEBUG) outputFile << "Bx2: " << Bx2 << " By2: " << By2 << std::endl;
+			if (DEBUG) outputFile << "Aradius: " << Aradius << " Bradius: " << Bradius << std::endl;
+			*/
+			//Calculate x/y velocities (note: MAY be able to use the properties of the circles, but if it changes directions
+			//at the wrong time in the main loop this WILL screw up )
+			float AxVel = Ax2 - Ax1;
+			float AyVel = Ay2 - Ay1;
+			float BxVel = Bx2 - Bx1;
+			float ByVel = By2 - By1;
+
+			//if (DEBUG) outputFile << "AxVel: " << AxVel << " AyVel " << AyVel << std::endl;
+			//if (DEBUG) outputFile << "BxVel: " << BxVel << " ByVel " << ByVel << std::endl;
+
+			//Calculate the relative velocity vector
+			float RelX = BxVel - AxVel;
+			float RelY = ByVel - AyVel;
+
+			//if (DEBUG) outputFile << "RelX: " << RelX << " RelY " << RelY << std::endl;
+
+			//Calculate the vector from B to A
+			float BAx = Bx1 - Ax1;
+			float BAy = By1 - Ay1;
+
+			//if (DEBUG) outputFile << "BAx " << BAx << " BAy " << BAy << std::endl;
+
+			//Project BA onto Rel: Magnitude = (Rel dot BA) / |Rel|^2 )
+			float numerator = ( RelX * BAx ) + ( RelY * BAy );
+			float denominator = ( RelX * RelX ) + ( RelY * RelY );
+			float magnitude;
+			if ( denominator != 0  )
+			{
+				magnitude = ( numerator / denominator );
+			}
+			else
+			{
+				//report an error (not really, I think this just means there was no relative motion
+				//and should be handled well before this point
+				return 0;
+			}
+
+			//if (DEBUG) outputFile << "numerator: " << numerator << std::endl;
+			//if (DEBUG) outputFile << "denominator: " << denominator << std::endl;
+			//if (DEBUG) outputFile << "magnitude: " << magnitude << std::endl;
+
+			//Project BA onto Rel: magnitude * Rel
+			float projX = magnitude * RelX;
+			float projY = magnitude * RelY;
+
+			//if (DEBUG) outputFile << "projX: " << projX << " projY: " << projY << std::endl;
+
+			//To calculate closestX and closestY, take CLAMP cases into consideration to calc closestX and closestY
+			//(also, keeping it readable now but... optimize the shit out of this)
+			//(consider Steve's suggestion)
+			//Dear God, please forgive me for ever writing this code
+			float closestX;
+			float closestY;
+			//int BxRel = Bx1 + RelX;
+			//int ByRel = By1 + RelY;
+
+			if ( RelX > 0.0f )
+			{
+				if ( projX >= RelX )
+				{
+					closestX = RelX;
+					closestY = RelY;
+				}
+				else if ( projX <= 0.0f )
+				{
+					closestX = 0.0f;
+					closestY = 0.0f;
+				}
+				else
+				{
+					closestX = projX;
+					closestY = projY;
+				}
+			}
+			else if ( RelX < 0.0f )
+			{
+				if ( projX <= RelX )
+				{
+					closestX = RelX;
+					closestY = RelY;
+				}
+				else if ( projX >= 0.0f )
+				{
+					closestX = 0.0f;
+					closestY = 0.0f;
+				}
+				else
+				{
+					closestX = projX;
+					closestY = projY;
+				}
+			}
+			else
+			{
+				if ( RelY > 0.0f )
+				{
+					if ( projY >= RelY )
+					{
+						closestX = RelX;
+						closestY = RelY;
+					}
+					else if ( projY <= 0.0f )
+					{
+						closestX = 0.0f;
+						closestY = 0.0f;
+					}
+					else
+					{
+						closestX = projX;
+						closestY = projY;
+					}
+				}
+				else if ( RelY < 0 )
+				{
+					if ( projY <= RelY )
+					{
+						closestX = RelX;
+						closestY = RelY;
+					}
+					else if ( projY >= 0 )
+					{
+						closestX = 0.0f;
+						closestY = 0.0f;
+					}
+					else
+					{
+						closestX = projX;
+						closestY = projY;
+					}
+				}
+				//"no motion" case... doesn't really matter what you do (?)
+				else
+				{
+					closestX = projX;
+					closestY = projY;
+				}
+			}
+
+			//if (DEBUG) outputFile << "closestX: " << closestX << " closestY: " << closestY << std::endl;
+			//if (DEBUG) outputFile << "( BAx - closestX ): " << (BAx - closestX) << " ( BAy - closestY ): " << (BAy - closestY) << std::endl;
+
+			//Calculate the distance squared (since this is just going to be used relative to radii squared
+			float distanceSquared = ( BAx - closestX )*( BAx - closestX ) + ( BAy - closestY )*( BAy - closestY );    //could probably optimize easily
+
+			//Square the combined radius
+			float combinedRadiusSquared = combinedRadius * combinedRadius;
+
+			//if (DEBUG) outputFile << "Comparing " << combinedRadiusSquared << " to " << distanceSquared << std::endl;
+
+			//Finally, compared the distances to determine if there is a collision
+			if ( distanceSquared <= combinedRadiusSquared )
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
 
 		bool check_collision( SDL_Rect A, SDL_Rect B )
 		{

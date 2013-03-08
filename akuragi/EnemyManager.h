@@ -14,6 +14,7 @@ public:
 	EnemyManager(SDL_Surface* enemyImage = NULL, SDL_Surface* dest = NULL);
 	void update(int frameNum);
 	void addEnemy(); // TODO: Make this private eventually and call it from update
+	const std::vector<GameObject>& getEnemyContainer();
 
 private:
 	std::vector<GameObject> enemyContainer;

@@ -21,7 +21,7 @@ void EnemyManager::update(int frameNum)
 		// Update the motion each enemy
 		iter->move();
 
-		// Check for collision
+		// If an enemy hits a wall, invert its orientation
 		if ( iter->getX() < 0 || iter->getX() + enemy_width > SCREEN_WIDTH )
 		{
 			iter->setXVel( iter->getXVel() * -1.0f );
@@ -63,4 +63,9 @@ void EnemyManager::toggleOrientation()
 		orientation = HORIZONTAL;
 	else
 		orientation = VERTICAL;
+}
+
+const std::vector<GameObject>& EnemyManager::getEnemyContainer()
+{
+	return enemyContainer;
 }

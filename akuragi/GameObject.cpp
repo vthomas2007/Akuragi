@@ -1,9 +1,11 @@
 #include "GameObject.h"
 #include "utility_functions.h"
+#include "constants.h" // can move this once you create a player sublcass (TODO)
 #include <iostream>
 #include <fstream>
 
 using namespace Akuragi::UtilFunctions;
+using namespace Akuragi::Constants;
 
 GameObject::GameObject()
 {
@@ -40,7 +42,37 @@ void GameObject::move()
 	y += yVel;
 }
 
-// GETTERS AND SETTERS -----------------------------------
+// TODO: Create a subclass for the player and move this to it
+void GameObject::handle_input( const SDL_Event& event )
+{
+	// If a key was pressed
+	if ( event.type == SDL_KEYDOWN )
+	{
+		// Adjust the velocity
+		switch ( event.key.keysym.sym )
+		{
+			case SDLK_UP: yVel -= image->h / 4; break;
+			case SDLK_DOWN: yVel += image->h / 4; break;
+			case SDLK_LEFT: xVel -= image->w / 4; break;
+			case SDLK_RIGHT: xVel += image->w / 4; break;
+		}
+	}
+	// If a key was released
+	else if ( event.type == SDL_KEYUP )
+	{
+		// Adjust the velocity
+		switch ( event.key.keysym.sym )
+		{
+			case SDLK_UP: yVel += image->h / 4; break;
+			case SDLK_DOWN: yVel -= image->h / 4; break;
+			case SDLK_LEFT: xVel += image->w / 4; break;
+			case SDLK_RIGHT: xVel -= image->w / 4; break;
+		}
+	}
+}
+
+
+// GETTERS --------------------------------------------------
 
 float GameObject::getX() const
 {
@@ -72,6 +104,13 @@ float GameObject::getYVel() const
 	return yVel;
 }
 
+SDL_Surface* GameObject::getImage() const
+{
+	return image;
+}
+
+// SETTERS --------------------------------------------------
+
 void GameObject::setX(float xVal)
 {
 	x = xVal;
@@ -100,4 +139,9 @@ void GameObject::setXVel(float xVelVal)
 void GameObject::setYVel(float yVelVal)
 {
 	yVel = yVelVal;
+}
+
+void GameObject::setImage(SDL_Surface* newImage)
+{
+	image = newImage;
 }

@@ -17,6 +17,7 @@ using namespace Akuragi::Constants;
 
 SDL_Surface *square = NULL;
 SDL_Surface *dot = NULL;
+SDL_Surface *whiteCircle = NULL;
 SDL_Surface *screen = NULL;
 
 SDL_Event my_event;
@@ -41,13 +42,15 @@ int main(int arg, char** argv)
 	// TODO: Offload all of this to a resource manager
 	square = load_image( "square.bmp" );
 	dot = load_image( "black-circle.png" );
+	whiteCircle = load_image( "white-circle.png" );
 	font = TTF_OpenFont( "lazy.ttf", 36 );
 	if ( square == NULL || dot == NULL || font == NULL )
 	{
 		return 1;
 	}
 
-	Square mySquare(square);
+	//Square mySquare(square);
+	GameObject player( whiteCircle, 0, 0, 0, 0 );
 	EnemyManager enemyManager( dot, screen );
 	//enemyManager.addEnemy();
 
@@ -68,7 +71,7 @@ int main(int arg, char** argv)
 		// While there are events to handle
 		while ( SDL_PollEvent( &my_event ) )
 		{
-			mySquare.handle_input( my_event );
+			player.handle_input( my_event );
 
 			if ( my_event.type == SDL_QUIT )
 			{
@@ -76,17 +79,23 @@ int main(int arg, char** argv)
 			}
 		}
 
-		// Move the square
-		mySquare.move();
-
 		// Fill the screen white
 		SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
 
+		// Move the square
+		player.move();
+
 		// Show the square on the screen
-		mySquare.show( screen );
+		player.show( screen );
 
 		// Update and show the enemies
 		enemyManager.update(frame);
+
+		// Check for enemy/player collisions
+		if ( check_enemy_player_collisions( enemyManager.getEnemyContainer(), player ) )
+		{
+			break;
+		}
 
         //Update the screen
         if( SDL_Flip( screen ) == -1 )
