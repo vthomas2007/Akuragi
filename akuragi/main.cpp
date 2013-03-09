@@ -50,10 +50,8 @@ int main(int arg, char** argv)
 		return 1;
 	}
 
-	//Square mySquare(square);
-	Player player( whiteCircle, blackCircle, 0, 0, 0, 0);
+	Player player( whiteCircle, blackCircle );
 	EnemyManager enemyManager( whiteCircle, blackCircle, screen );
-	//enemyManager.addEnemy();
 
 	int frame = 0;
 	bool cap = true;
@@ -85,22 +83,12 @@ int main(int arg, char** argv)
 
 		// Move the square
 		player.move();
-		// TODO: Move this functionality to the player class and override cuz this ain't good
-		if ( ( player.getX() < 0 ) || ( player.getX() + player.getImage()->w > SCREEN_WIDTH ) )
-		{
-			player.setX(player.getX() - player.getXVel());
-		}
-
-		if ( ( player.getY() < 0 ) || ( player.getY() + player.getImage()->h > SCREEN_HEIGHT ) )
-		{
-			player.setY(player.getY() - player.getYVel());
-		}
 
 		// Show the square on the screen
 		player.show( screen );
 
 		// Update and show the enemies
-		enemyManager.update(frame, &player.getSpawnBuffer());
+		enemyManager.update(frame, &player.getBoundingBox());
 
 		// Check for enemy/player collisions
 		if ( handle_enemy_player_collisions( enemyManager, player ) )

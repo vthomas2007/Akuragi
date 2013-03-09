@@ -1,14 +1,20 @@
 #include "EnemyManager.h"
 #include "constants.h"
-#include "utility_functions.h"
+
 #include <iterator>
 #include <cstdlib>
 #include <ctime>
 
+// TODO: Delete, temporary for debugging
+#include <fstream>
+#include <iostream>
+std::ofstream outputFile( "debug_output.txt", std::ios::out );
+bool tmpDebug = false;
+
 using namespace Akuragi::Constants;
 using namespace Akuragi::UtilFunctions;
 
-typedef std::list<GameObject>::iterator goIter;
+typedef std::list<GameObject>::iterator golIter;
 
 EnemyManager::EnemyManager(SDL_Surface* enemyWhiteImage, SDL_Surface* enemyBlackImage, SDL_Surface* dest)
 	:enemyWhiteImage(enemyWhiteImage), enemyBlackImage(enemyBlackImage), dest(dest), enemy_width(20), enemy_height(20), enemy_speed(5), framesBetweenEnemies(60)
@@ -16,9 +22,10 @@ EnemyManager::EnemyManager(SDL_Surface* enemyWhiteImage, SDL_Surface* enemyBlack
 	orientation = HORIZONTAL;
 }
 
-void EnemyManager::update(int frameNum, SDL_Rect* spawnBuffer)
+void EnemyManager::update( int frameNum, SDL_Rect* spawnBuffer )
 {
-	for (goIter iter = enemyContainer.begin(), end = enemyContainer.end(); iter != end; iter++ )
+	outputFile << "Updating..." << std::endl;
+	for (golIter iter = enemyContainer.begin(), end = enemyContainer.end(); iter != end; iter++ )
 	{
 		// Update the motion each enemy
 		iter->move();
@@ -43,8 +50,9 @@ void EnemyManager::update(int frameNum, SDL_Rect* spawnBuffer)
 	}
 }
 
-void EnemyManager::addEnemy(SDL_Rect* spawnBuffer )
+void EnemyManager::addEnemy( SDL_Rect* spawnBuffer )
 {
+	// Randomly determine the new enemy's polarity
 	polarity enemyPolarity = ( rand() % 2 == 0 ) ? WHITE : BLACK;
 	SDL_Surface* enemyImage = ( enemyPolarity == WHITE ) ? enemyWhiteImage : enemyBlackImage;
 
@@ -86,33 +94,79 @@ void EnemyManager::reset()
 	enemyContainer.clear();
 }
 
-bool handle_enemy_player_collisions( EnemyManager& enemyManager, GameObject& player )
+bool handle_enemy_player_collisions( EnemyManager& enemyManager, Player& player )
 {
+	bool playerDied = false;
+
+	outputFile << "size of enemy container: " << enemyManager.enemyContainer.size() << std::endl;
+	GameObject g;
+	bool absorbed = false;
+	int counter = 0;
+	
+	std::list<GameObject> tempPlayerObjects = player.getPlayerObjects();
+
 	// Iterate over the list of enemies
-	goIter iter = enemyManager.enemyContainer.begin(), end = enemyManager.enemyContainer.end(); 
-	while ( iter != end )
+	golIter enemyIter = enemyManager.enemyContainer.begin(), enemyEnd = enemyManager.enemyContainer.end(); 
+	while ( enemyIter != enemyEnd )
 	{
-		// Check if there is a collision with the enemy and the player
-		if ( check_circular_collision( *iter, player ) )
+		outputFile << "\tlooping over enemies..." << std::endl;
+		// Iterate over each player object
+		for ( golIter playerIter = tempPlayerObjects.begin(), playerEnd = tempPlayerObjects.end();
+			  playerIter != playerEnd;
+			  playerIter++ )
 		{
-			// Handle collisions accordingly
-			if ( iter->getPolarity() == player.getPolarity() )
+			outputFile << "\t\tlooping over player objects..." << std::endl;
+			// Check if there is a collision with the enemy and the player
+			if ( check_circular_collision( *enemyIter, *playerIter ) )
 			{
-				// The player has absorbed an enemy of the same polarity
-				iter = enemyManager.enemyContainer.erase(iter);
+				// Handle collisions accordingly
+				if ( enemyIter->getPolarity() == playerIter->getPolarity() )
+				{
+					outputFile << std::endl;
+					outputFile << "size of enemy container prior to absorbtion: " << enemyManager.enemyContainer.size() << std::endl;
+					outputFile << "counter: " << counter << std::endl;
+					// The player has absorbed an enemy of the same polarity
+
+					// TEMP, HACKY, TODO: FIX
+					//g.setImage(SDL_ConvertSurface(enemyIter->getImage(), enemyIter->getImage()->format, enemyIter->getImage()->flags));
+					g.setX(enemyIter->getX());
+					g.setY(enemyIter->getY());
+					g.setXVel(0);
+					g.setYVel(0);
+					g.setPolarity(enemyIter->getPolarity());
+					absorbed = true;
+					//player.absorbEnemy( g );
+					// enemyIter = enemyManager.enemyContainer.erase(enemyIter);
+
+					outputFile << "size of enemy container after absorbtion: " << enemyManager.enemyContainer.size() << std::endl << std::endl;
+					tmpDebug = true;
+				}
+				else
+				{
+					// The player has hit an enemy of opposite polarity
+					playerDied = true;
+					//enemyIter++;
+				}
 			}
 			else
 			{
-				// The player has hit an enemy of opposite polarity
-				return true;
+				// enemyIter++;
 			}
 		}
-		else
-		{
-			iter++;
+
+
+		if ( absorbed ) {
+			player.absorbEnemy(g);
+			enemyIter = enemyManager.enemyContainer.erase(enemyIter);
 		}
+		else {
+			enemyIter++;
+		}
+		counter++;
 	}
 
-	// The player has not hit any enemies of opposite polarity
-	return false;
+
+
+	// Return an indicator of whether or not the player died
+	return playerDied;
 }

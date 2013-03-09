@@ -14,5 +14,7 @@ namespace Akuragi
 
 		const int ENEMY_SPAWN_BUFFER_WIDTH = 200;
 		const int ENEMY_SPAWN_BUFFER_HEIGHT = 150;
+
+		const float PLAYER_SPEED = 10.0f;
 	}
 }

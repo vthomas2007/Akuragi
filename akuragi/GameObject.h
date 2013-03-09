@@ -22,6 +22,10 @@ public:
 	float getYVel() const;
 	SDL_Surface* getImage() const;
 	polarity getPolarity() const;
+	int getWidth() const;
+	int getHeight() const;
+	float getRightX() const;	// Naming isn't symmetric with getX and getY... maybe change this later
+	float getBottomY() const;
 
 	void setX(float xVal);
 	void setY(float yVal);
@@ -34,6 +38,9 @@ public:
 
 	void show(SDL_Surface* dest) const;
 	void move();
+
+	void moveX();
+	void moveY();
 
 protected:
 	SDL_Surface *image;

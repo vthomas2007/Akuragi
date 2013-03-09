@@ -35,10 +35,19 @@ void GameObject::show(SDL_Surface* dest) const
 
 void GameObject::move()
 {
-	xOld = x;
-	yOld = y;
+	moveX();
+	moveY();
+}
 
+void GameObject::moveX()
+{
+	xOld = x;
 	x += xVel;
+}
+
+void GameObject::moveY()
+{
+	yOld = y;
 	y += yVel;
 }
 
@@ -82,6 +91,26 @@ SDL_Surface* GameObject::getImage() const
 polarity GameObject::getPolarity() const
 {
 	return polarityValue;
+}
+
+int GameObject::getWidth() const
+{
+	return image->w;
+}
+
+int GameObject::getHeight() const
+{
+	return image->h;
+}
+
+float GameObject::getRightX() const
+{
+	return x + (float)getWidth();
+}
+
+float GameObject::getBottomY() const
+{
+	return y + (float)getHeight();
 }
 
 // SETTERS --------------------------------------------------

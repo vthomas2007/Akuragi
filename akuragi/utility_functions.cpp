@@ -5,8 +5,6 @@
 
 using namespace Akuragi::Constants;
 
-typedef std::list<GameObject>::const_iterator goIter;
-
 namespace Akuragi
 {
 	namespace UtilFunctions
@@ -101,7 +99,7 @@ namespace Akuragi
 		}
 		*/
 
-		bool check_circular_collision( const GameObject& A, const GameObject& B )
+		bool check_circular_collision( GameObject A, GameObject B )
 		{
 			//Initialize temporary variables to calculate the "center" of the object... may need to revisit class structure later
 			float AhalfWidth = (float)(A.getImage()->w / 2);
@@ -333,5 +331,10 @@ namespace Akuragi
 			SDL_Quit();
 		}
 		*/
+
+		int ftoi( float f )
+		{
+			return (int)(f + 0.5f);
+		}
 	}
 }

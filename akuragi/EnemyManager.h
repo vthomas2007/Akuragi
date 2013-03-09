@@ -2,8 +2,10 @@
 #define _ENEMYMANAGER_H_
 
 #include "SDL.h"
-#include "GameObject.h"
+#include "utility_functions.h"
+#include "Player.h"
 #include <list>
+
 
 enum orientations { VERTICAL, HORIZONTAL };
 
@@ -17,7 +19,7 @@ public:
 	const std::list<GameObject>& getEnemyContainer();
 	void reset();
 
-	friend bool handle_enemy_player_collisions( EnemyManager& enemyManager,GameObject& player );
+	friend bool handle_enemy_player_collisions( EnemyManager& enemyManager, Player& player );
 
 private:
 	std::list<GameObject> enemyContainer;
