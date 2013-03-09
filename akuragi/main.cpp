@@ -4,6 +4,7 @@
 
 #include "square.h"
 #include "GameObject.h"
+#include "Player.h"
 #include "EnemyManager.h"
 #include "timer.h"
 #include "utility_functions.h"
@@ -16,7 +17,7 @@ using namespace Akuragi::UtilFunctions;
 using namespace Akuragi::Constants;
 
 SDL_Surface *square = NULL;
-SDL_Surface *dot = NULL;
+SDL_Surface *blackCircle = NULL;
 SDL_Surface *whiteCircle = NULL;
 SDL_Surface *screen = NULL;
 
@@ -41,17 +42,17 @@ int main(int arg, char** argv)
 	// This is where "load files" used to be
 	// TODO: Offload all of this to a resource manager
 	square = load_image( "square.bmp" );
-	dot = load_image( "black-circle.png" );
+	blackCircle = load_image( "black-circle.png" );
 	whiteCircle = load_image( "white-circle.png" );
 	font = TTF_OpenFont( "lazy.ttf", 36 );
-	if ( square == NULL || dot == NULL || font == NULL )
+	if ( square == NULL || blackCircle == NULL || whiteCircle == NULL || font == NULL )
 	{
 		return 1;
 	}
 
 	//Square mySquare(square);
-	GameObject player( whiteCircle, 0, 0, 0, 0 );
-	EnemyManager enemyManager( dot, screen );
+	Player player( whiteCircle, blackCircle, 0, 0, 0, 0);
+	EnemyManager enemyManager( whiteCircle, blackCircle, screen );
 	//enemyManager.addEnemy();
 
 	int frame = 0;
@@ -102,7 +103,7 @@ int main(int arg, char** argv)
 		enemyManager.update(frame, &player.getSpawnBuffer());
 
 		// Check for enemy/player collisions
-		if ( check_enemy_player_collisions( enemyManager.getEnemyContainer(), player ) )
+		if ( handle_enemy_player_collisions( enemyManager, player ) )
 		{
 			enemyManager.reset();
 		}
@@ -125,6 +126,9 @@ int main(int arg, char** argv)
 
 	//clean_up();
 	SDL_FreeSurface( square );
+	SDL_FreeSurface( blackCircle );
+	SDL_FreeSurface( whiteCircle );
+	SDL_FreeSurface( screen );
 	TTF_CloseFont( font );
 	TTF_Quit();
 	SDL_Quit();

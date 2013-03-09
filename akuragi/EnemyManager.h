@@ -3,7 +3,7 @@
 
 #include "SDL.h"
 #include "GameObject.h"
-#include <vector>
+#include <list>
 
 enum orientations { VERTICAL, HORIZONTAL };
 
@@ -11,16 +11,19 @@ class EnemyManager
 {
 public:
 	// Constructors and destructors
-	EnemyManager(SDL_Surface* enemyImage = NULL, SDL_Surface* dest = NULL);
+	EnemyManager(SDL_Surface* enemyWhiteImage, SDL_Surface* enemyBlackImage, SDL_Surface* dest = NULL);
 	void update(int frameNum, SDL_Rect* spawnBuffer = NULL);
 	void addEnemy(SDL_Rect* spawnBuffer = NULL); // TODO: Make this private eventually and call it from update
-	const std::vector<GameObject>& getEnemyContainer();
+	const std::list<GameObject>& getEnemyContainer();
 	void reset();
 
+	friend bool handle_enemy_player_collisions( EnemyManager& enemyManager,GameObject& player );
+
 private:
-	std::vector<GameObject> enemyContainer;
+	std::list<GameObject> enemyContainer;
 	orientations orientation;
-	SDL_Surface* enemyImage;
+	SDL_Surface* enemyWhiteImage;
+	SDL_Surface* enemyBlackImage;
 	SDL_Surface* dest;
 
 	int enemy_width;

@@ -1,15 +1,17 @@
 #include "EnemyManager.h"
 #include "constants.h"
+#include "utility_functions.h"
 #include <iterator>
 #include <cstdlib>
 #include <ctime>
 
 using namespace Akuragi::Constants;
+using namespace Akuragi::UtilFunctions;
 
-typedef std::vector<GameObject>::iterator goIter;
+typedef std::list<GameObject>::iterator goIter;
 
-EnemyManager::EnemyManager(SDL_Surface* enemyImage, SDL_Surface* dest)
-	:enemyImage(enemyImage), dest(dest), enemy_width(20), enemy_height(20), enemy_speed(5), framesBetweenEnemies(60)
+EnemyManager::EnemyManager(SDL_Surface* enemyWhiteImage, SDL_Surface* enemyBlackImage, SDL_Surface* dest)
+	:enemyWhiteImage(enemyWhiteImage), enemyBlackImage(enemyBlackImage), dest(dest), enemy_width(20), enemy_height(20), enemy_speed(5), framesBetweenEnemies(60)
 {
 	orientation = HORIZONTAL;
 }
@@ -43,6 +45,9 @@ void EnemyManager::update(int frameNum, SDL_Rect* spawnBuffer)
 
 void EnemyManager::addEnemy(SDL_Rect* spawnBuffer )
 {
+	polarity enemyPolarity = ( rand() % 2 == 0 ) ? WHITE : BLACK;
+	SDL_Surface* enemyImage = ( enemyPolarity == WHITE ) ? enemyWhiteImage : enemyBlackImage;
+
 	// Ensure that the enemy doesn't spawn too close to the player
 	float x = (float)(rand() % (SCREEN_WIDTH - ENEMY_SPAWN_BUFFER_WIDTH - enemyImage->w ));
 	if ( spawnBuffer != NULL && x > spawnBuffer->x )
@@ -58,7 +63,7 @@ void EnemyManager::addEnemy(SDL_Rect* spawnBuffer )
 	float xVel = (orientation == HORIZONTAL) ? enemy_speed : 0;
 	float yVel = (orientation == VERTICAL) ? enemy_speed : 0;
 
-	enemyContainer.push_back(GameObject(enemyImage, x, y, xVel, yVel));
+	enemyContainer.push_back(GameObject(enemyImage, x, y, xVel, yVel, enemyPolarity));
 
 	toggleOrientation();
 }
@@ -71,7 +76,7 @@ void EnemyManager::toggleOrientation()
 		orientation = VERTICAL;
 }
 
-const std::vector<GameObject>& EnemyManager::getEnemyContainer()
+const std::list<GameObject>& EnemyManager::getEnemyContainer()
 {
 	return enemyContainer;
 }
@@ -79,4 +84,35 @@ const std::vector<GameObject>& EnemyManager::getEnemyContainer()
 void EnemyManager::reset()
 {
 	enemyContainer.clear();
+}
+
+bool handle_enemy_player_collisions( EnemyManager& enemyManager, GameObject& player )
+{
+	// Iterate over the list of enemies
+	goIter iter = enemyManager.enemyContainer.begin(), end = enemyManager.enemyContainer.end(); 
+	while ( iter != end )
+	{
+		// Check if there is a collision with the enemy and the player
+		if ( check_circular_collision( *iter, player ) )
+		{
+			// Handle collisions accordingly
+			if ( iter->getPolarity() == player.getPolarity() )
+			{
+				// The player has absorbed an enemy of the same polarity
+				iter = enemyManager.enemyContainer.erase(iter);
+			}
+			else
+			{
+				// The player has hit an enemy of opposite polarity
+				return true;
+			}
+		}
+		else
+		{
+			iter++;
+		}
+	}
+
+	// The player has not hit any enemies of opposite polarity
+	return false;
 }

@@ -3,12 +3,14 @@
 
 #include "SDL.h"
 
+enum polarity { WHITE, BLACK };
+
 class GameObject
 {
 public:
 	// Constructors and destructor
 	GameObject();
-	GameObject(SDL_Surface* image, float x, float y, float xVel, float yVel);
+	GameObject(SDL_Surface* image, float x, float y, float xVel, float yVel, polarity polarityValue = WHITE);
 	virtual ~GameObject();
 
 	// Getters and setters
@@ -19,6 +21,7 @@ public:
 	float getXVel() const;
 	float getYVel() const;
 	SDL_Surface* getImage() const;
+	polarity getPolarity() const;
 
 	void setX(float xVal);
 	void setY(float yVal);
@@ -27,19 +30,17 @@ public:
 	void setXVel(float xVelVal);
 	void setYVel(float yVelVal);
 	void setImage(SDL_Surface* newImage);
+	void setPolarity(polarity polarityValueVal);
 
 	void show(SDL_Surface* dest) const;
 	void move();
-
-	// TODO: Create a subclass for player objects and move these functions into it
-	void handle_input( const SDL_Event& event );
-	SDL_Rect getSpawnBuffer();
 
 protected:
 	SDL_Surface *image;
 	float x, y;
 	float xOld, yOld;
 	float xVel, yVel;
+	polarity polarityValue;
 };
 
 #endif

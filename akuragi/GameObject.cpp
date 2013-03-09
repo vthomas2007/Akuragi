@@ -11,8 +11,8 @@ GameObject::GameObject()
 {
 }
 
-GameObject::GameObject( SDL_Surface* image, float x, float y, float xVel, float yVel )
-	: image(image), x(x), y(y), xOld(x), yOld(y), xVel(xVel), yVel(yVel)
+GameObject::GameObject( SDL_Surface* image, float x, float y, float xVel, float yVel, polarity polarityValue )
+	: image(image), x(x), y(y), xOld(x), yOld(y), xVel(xVel), yVel(yVel), polarityValue(polarityValue)
 {
 }
 
@@ -41,47 +41,6 @@ void GameObject::move()
 	x += xVel;
 	y += yVel;
 }
-
-// TODO: Create a subclass for the player and move these to it
-void GameObject::handle_input( const SDL_Event& event )
-{
-	// If a key was pressed
-	if ( event.type == SDL_KEYDOWN )
-	{
-		// Adjust the velocity
-		switch ( event.key.keysym.sym )
-		{
-			case SDLK_UP: yVel -= image->h / 4; break;
-			case SDLK_DOWN: yVel += image->h / 4; break;
-			case SDLK_LEFT: xVel -= image->w / 4; break;
-			case SDLK_RIGHT: xVel += image->w / 4; break;
-		}
-	}
-	// If a key was released
-	else if ( event.type == SDL_KEYUP )
-	{
-		// Adjust the velocity
-		switch ( event.key.keysym.sym )
-		{
-			case SDLK_UP: yVel += image->h / 4; break;
-			case SDLK_DOWN: yVel -= image->h / 4; break;
-			case SDLK_LEFT: xVel += image->w / 4; break;
-			case SDLK_RIGHT: xVel -= image->w / 4; break;
-		}
-	}
-}
-
-SDL_Rect GameObject::getSpawnBuffer()
-{
-	SDL_Rect rect;
-	rect.x = (int)(x + 0.5f);
-	rect.y = (int)(y + 0.5f);
-	rect.w = image->w;
-	rect.h = image->h;
-
-	return rect;
-}
-
 
 // GETTERS --------------------------------------------------
 
@@ -120,6 +79,11 @@ SDL_Surface* GameObject::getImage() const
 	return image;
 }
 
+polarity GameObject::getPolarity() const
+{
+	return polarityValue;
+}
+
 // SETTERS --------------------------------------------------
 
 void GameObject::setX(float xVal)
@@ -155,4 +119,9 @@ void GameObject::setYVel(float yVelVal)
 void GameObject::setImage(SDL_Surface* newImage)
 {
 	image = newImage;
+}
+
+void GameObject::setPolarity(polarity polarityValueVal)
+{
+	polarityValue = polarityValueVal;
 }

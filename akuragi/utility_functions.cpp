@@ -5,7 +5,7 @@
 
 using namespace Akuragi::Constants;
 
-typedef std::vector<GameObject>::const_iterator goIter;
+typedef std::list<GameObject>::const_iterator goIter;
 
 namespace Akuragi
 {
@@ -100,19 +100,6 @@ namespace Akuragi
 			return true;
 		}
 		*/
-
-		bool check_enemy_player_collisions( const std::vector<GameObject>& enemies, const GameObject& player )
-		{
-			for ( goIter iter = enemies.begin(), end = enemies.end(); iter != end; iter++ )
-			{
-				if ( check_circular_collision( *iter, player ) )
-				{
-					return true;
-				}
-			}
-
-			return false;
-		}
 
 		bool check_circular_collision( const GameObject& A, const GameObject& B )
 		{

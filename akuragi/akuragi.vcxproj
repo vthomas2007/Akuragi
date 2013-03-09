@@ -72,6 +72,7 @@
     <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="player.cpp" />
     <ClCompile Include="square.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="utility_functions.cpp" />
@@ -81,6 +82,7 @@
     <ClInclude Include="dot.h" />
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="player.h" />
     <ClInclude Include="square.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="utility_functions.h" />
