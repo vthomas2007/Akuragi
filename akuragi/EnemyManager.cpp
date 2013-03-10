@@ -122,10 +122,10 @@ bool handle_enemy_player_collisions( EnemyManager& enemyManager, Player& player 
 
 					// TEMP, HACKY, TODO: FIX
 					//g.setImage(SDL_ConvertSurface(enemyIter->getImage(), enemyIter->getImage()->format, enemyIter->getImage()->flags));
-					g.setX(enemyIter->getX());
-					g.setY(enemyIter->getY());
-					g.setXVel(0);
-					g.setYVel(0);
+					g.setX(enemyIter->getX() + playerIter->getXVel());
+					g.setY(enemyIter->getY() + playerIter->getYVel());
+					g.setXVel(playerIter->getXVel());
+					g.setYVel(playerIter->getYVel());
 					g.setPolarity(enemyIter->getPolarity());
 					absorbed = true;
 					//player.absorbEnemy( g );

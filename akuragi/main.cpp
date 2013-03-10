@@ -81,10 +81,10 @@ int main(int arg, char** argv)
 		// Fill the screen white
 		SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
 
-		// Move the square
+		// Move the player
 		player.move();
 
-		// Show the square on the screen
+		// Show the player on the screen
 		player.show( screen );
 
 		// Update and show the enemies
