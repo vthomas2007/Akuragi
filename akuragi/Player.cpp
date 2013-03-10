@@ -149,12 +149,12 @@ void Player::updateBoundingBox()
 	{
 		if ( iter->getX() < xLeft )
 			xLeft = iter->getX();
-		if ( iter->getX() + iter->getImage()->w > xRight )
-			xRight = iter->getX();
+		if ( iter->getRightX() > xRight )
+			xRight = iter->getRightX();
 		if ( iter->getY() < yTop )
 			yTop = iter->getY();
-		if ( iter->getY() > yBottom )
-			yBottom = iter->getY();
+		if ( iter->getBottomY() > yBottom )
+			yBottom = iter->getBottomY();
 	}
 
 	boundingBox.x = ftoi(xLeft);

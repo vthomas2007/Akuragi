@@ -6,10 +6,9 @@
 #include <ctime>
 
 // TODO: Delete, temporary for debugging
-#include <fstream>
-#include <iostream>
-std::ofstream outputFile( "debug_output.txt", std::ios::out );
-bool tmpDebug = false;
+//#include <fstream>
+//#include <iostream>
+//std::ofstream outputFile( "debug_output.txt", std::ios::out );
 
 using namespace Akuragi::Constants;
 using namespace Akuragi::UtilFunctions;
@@ -30,12 +29,20 @@ void EnemyManager::update( int frameNum, SDL_Rect* spawnBuffer )
 		iter->move();
 
 		// If an enemy hits a wall, invert its orientation
-		if ( iter->getX() < 0 || iter->getX() + enemy_width > SCREEN_WIDTH )
+		if ( iter->getX() < 0 || iter->getRightX() > SCREEN_WIDTH )
 		{
+			if ( iter->getX() < 0 )
+				iter->setX(0.0f);
+			if ( iter->getRightX() > SCREEN_WIDTH )
+				iter->setX( (float)(SCREEN_WIDTH - iter->getWidth()) );
 			iter->setXVel( iter->getXVel() * -1.0f );
 		}
-		if ( iter->getY() < 0 || iter->getY() + enemy_height > SCREEN_HEIGHT )
+		if ( iter->getY() < 0 || iter->getBottomY() > SCREEN_HEIGHT )
 		{
+			if ( iter->getY() < 0 )
+				iter->setY(0.0f);
+			if ( iter->getBottomY() > SCREEN_HEIGHT )
+				iter->setY( (float)(SCREEN_HEIGHT - iter->getHeight()) );
 			iter->setYVel( iter->getYVel() * -1.0f );
 		}
 
