@@ -12,10 +12,12 @@ namespace Akuragi
 
 		const int FRAMES_PER_SECOND = 60;
 
-		//const int ENEMY_SPAWN_BUFFER_WIDTH = 200;
-		//const int ENEMY_SPAWN_BUFFER_HEIGHT = 150;
 		const int ENEMY_SPAWN_BUFFER = 100;
 
 		const float PLAYER_SPEED = 10.0f;
+		const int PLAYER_RESPAWN_TIME = 30;
+		const int PLAYER_LIVES = 3; // TODO: Determine if these values should live in Player.h
+
+		enum gameState { INIT, ACTIVE, PAUSED, GAME_OVER };
 	}
 }

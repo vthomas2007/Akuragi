@@ -16,11 +16,16 @@ public:
 	int getXRight() const;
 	int getYTop() const;
 	int getYBottom() const;
+	int getLives() const;
+	int getRespawnTimer() const;
 
 	void handle_input( const SDL_Event& event );
 	void move();
 	void show( SDL_Surface* dest ) const;
 	void absorbEnemy( GameObject enemy );
+	void die();
+	void decrementRespawnTimer();
+	void reset();
 
 private:
 	void updateBoundingBox();
@@ -33,6 +38,9 @@ private:
 	// Not wild about this, redundant since the GameObject already has velocities
 	// TODO: Refactor, find a way to eliminate this
 	float xVel, yVel;
+
+	int lives;
+	int respawnTimer;  // Should this live in some kind of game manager class? (TODO)
 };
 
 #endif

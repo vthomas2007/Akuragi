@@ -10,7 +10,7 @@ typedef std::list<GameObject>::iterator golIter;
 typedef std::list<GameObject>::const_iterator constGolIter;
 
 Player::Player(SDL_Surface* whiteImage, SDL_Surface* blackImage)
-	:whiteImage(whiteImage), blackImage(blackImage), xVel(0), yVel(0)
+	:whiteImage(whiteImage), blackImage(blackImage), xVel(0), yVel(0), respawnTimer(0), lives(PLAYER_LIVES)
 {
 	playerObjects.push_back(GameObject(whiteImage, 0, 0, 0, 0, WHITE));
 	updateBoundingBox();
@@ -44,6 +44,16 @@ int Player::getYTop() const
 int Player::getYBottom() const
 {
 	return boundingBox.y + boundingBox.h;
+}
+
+int Player::getLives() const
+{
+	return lives;
+}
+
+int Player::getRespawnTimer() const
+{
+	return respawnTimer;
 }
 
 void Player::handle_input( const SDL_Event& event )
@@ -161,4 +171,24 @@ void Player::updateBoundingBox()
 	boundingBox.y = ftoi(yTop);
 	boundingBox.w = ftoi(xRight - xLeft);
 	boundingBox.h = ftoi(yBottom - yTop);
+}
+
+void Player::die()
+{
+	lives--;
+	respawnTimer = PLAYER_RESPAWN_TIME;
+}
+
+void Player::decrementRespawnTimer()
+{
+	respawnTimer--;
+}
+
+void Player::reset()
+{
+	playerObjects.clear();
+	playerObjects.push_back(GameObject(whiteImage, 0, 0, 0, 0, WHITE));
+	updateBoundingBox();
+	lives = PLAYER_LIVES;
+	respawnTimer = 0;
 }
