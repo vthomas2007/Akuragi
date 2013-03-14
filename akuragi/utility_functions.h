@@ -21,6 +21,7 @@ namespace Akuragi
 		bool check_collision( SDL_Rect A, SDL_Rect B );
 		void clean_up();
 		int ftoi( float f );
+		std::string itos ( int i );
 	}
 }
 

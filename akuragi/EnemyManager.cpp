@@ -29,20 +29,20 @@ void EnemyManager::update( int frameNum, SDL_Rect* spawnBuffer )
 		iter->move();
 
 		// If an enemy hits a wall, invert its orientation
-		if ( iter->getX() < 0 || iter->getRightX() > SCREEN_WIDTH )
+		if ( iter->getX() < LEFT_BORDER || iter->getRightX() > RIGHT_BORDER )
 		{
-			if ( iter->getX() < 0 )
-				iter->setX(0.0f);
-			if ( iter->getRightX() > SCREEN_WIDTH )
-				iter->setX( (float)(SCREEN_WIDTH - iter->getWidth()) );
+			if ( iter->getX() < LEFT_BORDER )
+				iter->setX((float)LEFT_BORDER);
+			if ( iter->getRightX() > RIGHT_BORDER )
+				iter->setX( (float)(RIGHT_BORDER - iter->getWidth()) );
 			iter->setXVel( iter->getXVel() * -1.0f );
 		}
-		if ( iter->getY() < 0 || iter->getBottomY() > SCREEN_HEIGHT )
+		if ( iter->getY() < TOP_BORDER || iter->getBottomY() > BOTTOM_BORDER )
 		{
-			if ( iter->getY() < 0 )
-				iter->setY(0.0f);
-			if ( iter->getBottomY() > SCREEN_HEIGHT )
-				iter->setY( (float)(SCREEN_HEIGHT - iter->getHeight()) );
+			if ( iter->getY() < TOP_BORDER )
+				iter->setY((float)TOP_BORDER);
+			if ( iter->getBottomY() > BOTTOM_BORDER )
+				iter->setY( (float)(BOTTOM_BORDER - iter->getHeight()) );
 			iter->setYVel( iter->getYVel() * -1.0f );
 		}
 
@@ -73,7 +73,7 @@ void EnemyManager::addEnemy( SDL_Rect* spawnBuffer )
 	int bufferHeight = spawnBuffer->h + (2 * ENEMY_SPAWN_BUFFER);
 	int bufferArea = bufferWidth * bufferHeight;
 
-	int screenArea = SCREEN_WIDTH * SCREEN_HEIGHT;
+	int screenArea = PLAYABLE_WIDTH * PLAYABLE_HEIGHT;
 	int spawnableAreaTotal = screenArea - bufferArea;
 
 	// NOTE:
@@ -83,10 +83,10 @@ void EnemyManager::addEnemy( SDL_Rect* spawnBuffer )
 	// but not horizontally
 	// SpawnableAreaHoriz represents the region that aligns horizontally with the player's spawn buffer,
 	// but not veritcally
-	int spawnableAreaHoriz = ( SCREEN_WIDTH * bufferHeight ) - bufferArea;
+	int spawnableAreaHoriz = ( PLAYABLE_WIDTH * bufferHeight ) - bufferArea;
 	float horizRatio = ( (float)spawnableAreaHoriz / (float)spawnableAreaTotal ) * 100.0f;
 
-	int spawnableAreaVert = ( SCREEN_HEIGHT * bufferWidth ) - bufferArea;
+	int spawnableAreaVert = ( PLAYABLE_HEIGHT * bufferWidth ) - bufferArea;
 	float vertRatio = ( (float)spawnableAreaVert / (float)spawnableAreaTotal ) * 100.0f;
 
 	// TODO: When done testing and debugging, delete these two lines, shouldn't need 'em
@@ -101,7 +101,7 @@ void EnemyManager::addEnemy( SDL_Rect* spawnBuffer )
 	if ( areaDecider < horizRatio )
 	{
 		// Spawn in the horizontal area
-		x = rand() % ( SCREEN_WIDTH - bufferWidth );
+		x = rand() % ( PLAYABLE_WIDTH - bufferWidth );
 		if ( x > bufferX )
 		{
 			x += bufferWidth;
@@ -115,7 +115,7 @@ void EnemyManager::addEnemy( SDL_Rect* spawnBuffer )
 		// Spawn in the vertical area
 		x = ( rand() % bufferWidth );
 
-		y = rand() % ( SCREEN_HEIGHT - bufferHeight );
+		y = rand() % ( PLAYABLE_HEIGHT - bufferHeight );
 		if ( y > bufferY )
 		{
 			y += bufferHeight;
@@ -124,14 +124,13 @@ void EnemyManager::addEnemy( SDL_Rect* spawnBuffer )
 	else
 	{
 		// Spawn in the diagonal area
-				// Spawn in the horizontal area
-		x = rand() % ( SCREEN_WIDTH - bufferWidth );
+		x = rand() % ( PLAYABLE_WIDTH - bufferWidth );
 		if ( x > bufferX )
 		{
 			x += bufferWidth;
 		}
 
-		y = rand() % ( SCREEN_HEIGHT - bufferHeight );
+		y = rand() % ( PLAYABLE_HEIGHT - bufferHeight );
 		if ( y > bufferY )
 		{
 			y += bufferHeight;

@@ -29,6 +29,7 @@ SDL_Event event;
 TTF_Font *font = NULL;
 
 SDL_Color blackTextColor = { 0, 0, 0 };
+SDL_Color livesTextColor = { 200, 200, 200 };
 SDL_Color whiteTextColor = { 255, 255, 255 };
 
 
@@ -48,16 +49,58 @@ int main(int arg, char** argv)
 	square = load_image( "square.bmp" );
 	blackCircle = load_image( "black-circle.png" );
 	whiteCircle = load_image( "white-circle.png" );
-	font = TTF_OpenFont( "lazy.ttf", 36 );
+	font = TTF_OpenFont( "Luhyouone.ttf", 72 );
+	TTF_Font* labelFont = TTF_OpenFont( "Luhyouone.ttf", 48 );
+	TTF_Font* livesFont = TTF_OpenFont( "Luhyouone.ttf", 192 );
 	gameTitleText = TTF_RenderText_Solid( font, "Akuragi", blackTextColor );
 	startGameText = TTF_RenderText_Solid( font, "Press 'Enter' to begin", blackTextColor );
+	//startGameText = TTF_RenderText_Solid( font, itos( gameTitleText->h ).c_str() , blackTextColor );
 	pausedText = TTF_RenderText_Solid( font, "Press 'p' or 'enter' to resume", whiteTextColor );
+	SDL_Surface* scoreText = NULL;
+	SDL_Surface* multiplierText = NULL;
+	SDL_Surface* livesText = NULL;
+	SDL_Surface* previousScoreText = NULL;
+
+	SDL_Rect leftFrame;
+	leftFrame.x = 0;
+	leftFrame.y = 0;
+	leftFrame.w = PLAYABLE_X_OFFSET;
+	leftFrame.h = SCREEN_HEIGHT;
+	
+	SDL_Rect rightFrame;
+	rightFrame.x = SCREEN_WIDTH - PLAYABLE_X_OFFSET;
+	rightFrame.y = 0;
+	rightFrame.w = PLAYABLE_X_OFFSET;
+	rightFrame.h = SCREEN_HEIGHT;
+	
+	SDL_Rect topFrame;
+	topFrame.x = PLAYABLE_X_OFFSET;
+	topFrame.y = 0;
+	topFrame.w = PLAYABLE_WIDTH;
+	topFrame.h = PLAYABLE_Y_OFFSET;
+	
+	SDL_Rect middleFrame;
+	middleFrame.x = PLAYABLE_X_OFFSET;
+	middleFrame.y = PLAYABLE_Y_OFFSET + PLAYABLE_HEIGHT;
+	middleFrame.w = PLAYABLE_WIDTH;
+	middleFrame.h = PLAYABLE_X_OFFSET;
+	
+	SDL_Rect bottomFrame;
+	bottomFrame.x = PLAYABLE_X_OFFSET;
+	bottomFrame.y = SCREEN_HEIGHT - PLAYABLE_Y_OFFSET;
+	bottomFrame.w = PLAYABLE_WIDTH;
+	bottomFrame.h = PLAYABLE_Y_OFFSET;
+	
+	Uint32 frameColor = SDL_MapRGB( screen->format, 0x00, 0x00, 0x00 );
+	// END TODO
+
 	
 	if ( square == NULL || blackCircle == NULL || whiteCircle == NULL || font == NULL )
 	{
 		return 1;
 	}
 
+	int previousScore = -1;
 	gameState currentState = INIT;
 
 	Player player( whiteCircle, blackCircle );
@@ -127,6 +170,12 @@ int main(int arg, char** argv)
 			SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
 			apply_surface( 100, 100, gameTitleText, screen );
 			apply_surface( 100, 200, startGameText, screen );
+
+			if ( previousScore >= 0 )
+			{
+				previousScoreText = TTF_RenderText_Solid( labelFont, (std::string("Previous Score: ") + itos(previousScore)).c_str(), livesTextColor );
+				apply_surface(100, 400, previousScoreText, screen );
+			}
 		}
 		else if ( currentState == ACTIVE )
 		{
@@ -134,6 +183,24 @@ int main(int arg, char** argv)
 			{
 				// Fill the screen white
 				SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
+
+				// Draw the frame
+				SDL_FillRect( screen, &leftFrame, frameColor );
+				SDL_FillRect( screen, &rightFrame, frameColor );
+				SDL_FillRect( screen, &topFrame, frameColor );
+				SDL_FillRect( screen, &bottomFrame, frameColor );
+				SDL_FillRect( screen, &middleFrame, frameColor );
+
+				// Draw the score, lives, and multiplier text
+				scoreText = TTF_RenderText_Solid( labelFont, (std::string("Score: ") + itos(player.getScore())).c_str(), blackTextColor );
+				apply_surface( 30, 650, scoreText, screen );
+
+				multiplierText = TTF_RenderText_Solid( labelFont, (std::string("Multiplier: ") + itos(player.getMultiplier())).c_str(), blackTextColor );
+				apply_surface( 420, 650, multiplierText, screen );
+
+				livesText = TTF_RenderText_Solid( livesFont, itos(player.getLives()).c_str(), livesTextColor );
+				//SDL_Surface* tmpTxt = TTF_RenderText_Solid( livesFont, itos(livesText->h).c_str(), livesTextColor );
+				apply_surface( 350, 155, livesText, screen );
 
 				// Move the player
 				player.move();
@@ -170,6 +237,7 @@ int main(int arg, char** argv)
 		else if ( currentState == GAME_OVER )
 		{
 			// Give option to restart the game
+			previousScore = player.getScore();
 			player.reset();
 			currentState = INIT;
 		}
@@ -196,6 +264,7 @@ int main(int arg, char** argv)
 	SDL_FreeSurface( whiteCircle );
 	SDL_FreeSurface( screen );
 	TTF_CloseFont( font );
+	TTF_CloseFont( labelFont );
 	TTF_Quit();
 	SDL_Quit();
 

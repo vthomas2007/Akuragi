@@ -2,6 +2,7 @@
 #include "constants.h"
 #include <cstdlib>
 #include <ctime>
+#include <sstream>	// For int to string conversion
 
 using namespace Akuragi::Constants;
 
@@ -335,6 +336,13 @@ namespace Akuragi
 		int ftoi( float f )
 		{
 			return (int)(f + 0.5f);
+		}
+
+		std::string itos( int i )
+		{
+			std::stringstream ss;
+			ss << i;
+			return ss.str();
 		}
 	}
 }

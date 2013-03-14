@@ -10,9 +10,10 @@ typedef std::list<GameObject>::iterator golIter;
 typedef std::list<GameObject>::const_iterator constGolIter;
 
 Player::Player(SDL_Surface* whiteImage, SDL_Surface* blackImage)
-	:whiteImage(whiteImage), blackImage(blackImage), xVel(0), yVel(0), respawnTimer(0), lives(PLAYER_LIVES)
+	:whiteImage(whiteImage), blackImage(blackImage), xVel(0), yVel(0), respawnTimer(0), lives(PLAYER_LIVES),
+	 score(0), multiplier(1)
 {
-	playerObjects.push_back(GameObject(whiteImage, 0, 0, 0, 0, WHITE));
+	playerObjects.push_back(GameObject(whiteImage, (float)PLAYABLE_X_OFFSET, (float)PLAYABLE_Y_OFFSET, 0, 0, WHITE));
 	updateBoundingBox();
 }
 
@@ -51,6 +52,16 @@ int Player::getLives() const
 	return lives;
 }
 
+int Player::getScore() const
+{
+	return score;
+}
+
+int Player::getMultiplier() const
+{
+	return multiplier;
+}
+
 int Player::getRespawnTimer() const
 {
 	return respawnTimer;
@@ -83,6 +94,9 @@ void Player::handle_input( const SDL_Event& event )
 		// Adjust the velocity
 		switch ( event.key.keysym.sym )
 		{
+			// TODO: There is a bug that occurs when
+			// the player has a key held down during a state change, look into polling keystates
+			// as possibly better alternative
 			case SDLK_UP: yVel += PLAYER_SPEED; break;
 			case SDLK_DOWN: yVel -= PLAYER_SPEED; break;
 			case SDLK_LEFT: xVel += PLAYER_SPEED; break;
@@ -97,6 +111,7 @@ void Player::handle_input( const SDL_Event& event )
 	{
 		newPolarity = ( playerObjects.begin()->getPolarity() == WHITE ) ? BLACK : WHITE;
 		newPolarityImage = ( newPolarity == WHITE ) ? whiteImage : blackImage;
+		multiplier = 1;
 	}
 
 	for ( golIter iter = playerObjects.begin(), end = playerObjects.end(); iter != end; iter++ )
@@ -118,9 +133,9 @@ void Player::move()
 	bool yShouldMove = false;
 
 	// If moving the player does not shove it out of bounds, move it
-	if ( getXLeft() + xVel >= 0 && getXRight() + xVel <= SCREEN_WIDTH )
+	if ( getXLeft() + xVel >= LEFT_BORDER && getXRight() + xVel <= RIGHT_BORDER )
 		xShouldMove = true;
-	if ( getYTop() + yVel >= 0 && getYBottom() + yVel <= SCREEN_HEIGHT )
+	if ( getYTop() + yVel >= TOP_BORDER && getYBottom() + yVel <= BOTTOM_BORDER )
 		yShouldMove = true;
 
 	if ( xShouldMove || yShouldMove )
@@ -147,6 +162,8 @@ void Player::absorbEnemy( GameObject enemy )
 {
 	SDL_Surface* tmpImage = ( enemy.getPolarity() == WHITE ) ? whiteImage : blackImage;
 	playerObjects.push_back( GameObject(tmpImage, enemy.getX(), enemy.getY(), enemy.getXVel(), enemy.getYVel(), enemy.getPolarity() ) );
+	score += ABSORB_POINTS * multiplier;
+	multiplier++;
 }
 
 void Player::updateBoundingBox()
@@ -186,9 +203,12 @@ void Player::decrementRespawnTimer()
 
 void Player::reset()
 {
+	// TODO: Consider calling all of this functionality from the ctor to avoid duplicate code
 	playerObjects.clear();
-	playerObjects.push_back(GameObject(whiteImage, 0, 0, 0, 0, WHITE));
+	playerObjects.push_back(GameObject(whiteImage, (float)PLAYABLE_X_OFFSET, (float)PLAYABLE_Y_OFFSET, 0, 0, WHITE));
 	updateBoundingBox();
 	lives = PLAYER_LIVES;
 	respawnTimer = 0;
+	score = 0;
+	multiplier = 1;
 }

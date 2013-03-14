@@ -17,6 +17,8 @@ public:
 	int getYTop() const;
 	int getYBottom() const;
 	int getLives() const;
+	int getScore() const;
+	int getMultiplier() const;
 	int getRespawnTimer() const;
 
 	void handle_input( const SDL_Event& event );
@@ -40,6 +42,8 @@ private:
 	float xVel, yVel;
 
 	int lives;
+	int score;
+	int multiplier;
 	int respawnTimer;  // Should this live in some kind of game manager class? (TODO)
 };
 
