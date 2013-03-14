@@ -76,6 +76,7 @@ void Player::handle_input( const SDL_Event& event )
 	SDL_Surface* newPolarityImage = NULL;
 
 	// If a key was pressed
+	/*
 	if ( event.type == SDL_KEYDOWN )
 	{
 		// Adjust the velocity
@@ -103,6 +104,32 @@ void Player::handle_input( const SDL_Event& event )
 			case SDLK_RIGHT: xVel -= PLAYER_SPEED; break;
 		}
 	}
+	*/
+	// Try keystates to fix a bug that occurs when a player has a keydown while switching into ACTIVE
+	// state, causing keyup to fire when you don't want it to
+	if ( event.type == SDL_KEYDOWN )
+	{
+		if ( event.key.keysym.sym == SDLK_SPACE )
+		{
+			changePolarity = true;
+		}
+	}
+
+	Uint8 *keyStates = SDL_GetKeyState( NULL );
+
+	float tmpXVel = 0.0f;
+	float tmpYVel = 0.0f;
+	if ( keyStates[ SDLK_UP ] )
+		tmpYVel -= PLAYER_SPEED;
+	if ( keyStates[ SDLK_DOWN ] )
+		tmpYVel += PLAYER_SPEED;
+	if ( keyStates[ SDLK_LEFT ] )
+		tmpXVel -= PLAYER_SPEED;
+	if ( keyStates[ SDLK_RIGHT ] )
+		tmpXVel += PLAYER_SPEED;
+
+	xVel = tmpXVel;
+	yVel = tmpYVel;
 
 	// If necessary, set the new polarity value and image
 	// NOTE: This will only work if you assume the player can only have all objects of one polarity type
