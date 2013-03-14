@@ -101,7 +101,9 @@ int main(int arg, char** argv)
 	}
 
 	int previousScore = -1;
-	gameState currentState = INIT;
+	// Temporary for easier testing, TODO: change initial state back to INIT
+	//gameState currentState = INIT;
+	gameState currentState = ACTIVE;
 
 	Player player( whiteCircle, blackCircle );
 	EnemyManager enemyManager( whiteCircle, blackCircle, screen );
@@ -199,7 +201,6 @@ int main(int arg, char** argv)
 				apply_surface( 420, 650, multiplierText, screen );
 
 				livesText = TTF_RenderText_Solid( livesFont, itos(player.getLives()).c_str(), livesTextColor );
-				//SDL_Surface* tmpTxt = TTF_RenderText_Solid( livesFont, itos(livesText->h).c_str(), livesTextColor );
 				apply_surface( 350, 155, livesText, screen );
 
 				// Move the player
@@ -212,6 +213,7 @@ int main(int arg, char** argv)
 				enemyManager.update(frame, &player.getBoundingBox());
 
 				// Check for enemy/player collisions
+				// "collision" in this context means a player hit an enemy of OPPOSITE polarity
 				if ( handle_enemy_player_collisions( enemyManager, player ) )
 				{
 					enemyManager.reset();
