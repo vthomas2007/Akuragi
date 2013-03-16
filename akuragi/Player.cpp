@@ -67,6 +67,11 @@ int Player::getRespawnTimer() const
 	return respawnTimer;
 }
 
+polarity Player::getPolarity() const
+{
+	return playerObjects.front().getPolarity();
+}
+
 void Player::handle_input( const SDL_Event& event )
 {
 	float tempYVel = 0;

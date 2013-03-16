@@ -20,6 +20,7 @@ public:
 	int getScore() const;
 	int getMultiplier() const;
 	int getRespawnTimer() const;
+	polarity getPolarity() const;
 
 	void handle_input( const SDL_Event& event );
 	void move();

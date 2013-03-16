@@ -5,11 +5,6 @@
 #include <cstdlib>
 #include <ctime>
 
-// TODO: Delete, temporary for debugging
-//#include <fstream>
-//#include <iostream>
-//std::ofstream outputFile( "debug_output.txt", std::ios::out );
-
 using namespace Akuragi::Constants;
 using namespace Akuragi::UtilFunctions;
 

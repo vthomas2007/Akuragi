@@ -1,6 +1,7 @@
 #include "SDL.h"
 #include "SDL_image.h"
 #include "SDL_ttf.h"
+#include "SDL_mixer.h"
 
 #include "square.h"
 #include "GameObject.h"
@@ -15,6 +16,11 @@
 
 using namespace Akuragi::UtilFunctions;
 using namespace Akuragi::Constants;
+
+// TODO: Delete, temporary for debugging
+#include <fstream>
+#include <iostream>
+std::ofstream outputFile( "debug_output.txt", std::ios::out );
 
 SDL_Surface *square = NULL;
 SDL_Surface *blackCircle = NULL;
@@ -35,6 +41,11 @@ SDL_Color whiteTextColor = { 255, 255, 255 };
 
 int main(int arg, char** argv)
 {
+	Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096 );
+	Mix_Music* katamariMusic = Mix_LoadMUS( "music1.ogg" );
+	Mix_Music* ikarugaMusic = Mix_LoadMUS( "music2.ogg" );
+	Mix_PlayMusic( katamariMusic, -1 );
+
 	bool quit = false;
 
 	if ( init() == false )
@@ -111,6 +122,8 @@ int main(int arg, char** argv)
 	int frame = 0;
 	bool cap = true;
 	Timer fps;
+	Timer musicTimer;
+	musicTimer.start();
 
 	if ( SDL_Flip( screen ) == -1 )
 	{
@@ -146,7 +159,28 @@ int main(int arg, char** argv)
 						currentState = PAUSED;
 					}
 				}
+				polarity oldPolarity = player.getPolarity();
 				player.handle_input( event );
+				// If the player changes polarity, change the music as well
+				if ( player.getPolarity() != oldPolarity )
+				{
+					//Mix_RewindMusic();
+					if ( player.getPolarity() == BLACK )
+					{
+						double startPosition = ( musicTimer.get_ticks() / 1000 ) % 240;
+						outputFile << fps.get_ticks() << " " << itos((int)startPosition) << std::endl;
+						Mix_PlayMusic( ikarugaMusic, -1 );
+						Mix_SetMusicPosition( startPosition );
+					}
+					else
+					{
+						double startPosition = ( musicTimer.get_ticks() / 1000 ) % 357;
+						outputFile << fps.get_ticks() << " " << itos((int)startPosition) << std::endl;
+						Mix_PlayMusic( katamariMusic, -1 );
+						Mix_SetMusicPosition( startPosition );
+						//Mix_SetMusicPosition( 60.0f );
+					}
+				}
 			}
 			else if ( currentState == PAUSED )
 			{
@@ -251,6 +285,7 @@ int main(int arg, char** argv)
         }
 
 		frame++;
+		outputFile << itos(fps.get_ticks()) << std::endl;
 
 		// Cap the frame rate if necessary
 		if ( cap && fps.get_ticks() < 1000 / FRAMES_PER_SECOND )
@@ -258,6 +293,7 @@ int main(int arg, char** argv)
 			// Sleep the remaining frame time
 			SDL_Delay( ( 1000 / FRAMES_PER_SECOND ) - fps.get_ticks() );
 		}
+		
 	}
 
 	//clean_up();
