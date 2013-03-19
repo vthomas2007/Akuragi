@@ -25,6 +25,8 @@ using namespace Akuragi::Constants;
 SDL_Surface *square = NULL;
 SDL_Surface *blackCircle = NULL;
 SDL_Surface *whiteCircle = NULL;
+SDL_Surface *face = NULL;
+SDL_Surface *bowlingBall = NULL;
 SDL_Surface *screen = NULL;
 SDL_Surface *gameTitleText = NULL;
 SDL_Surface *startGameText = NULL;
@@ -58,15 +60,19 @@ int main(int arg, char** argv)
 	// This is where "load files" used to be
 	// TODO: Offload all of this to a resource manager
 	square = load_image( "square.bmp" );
-	blackCircle = load_image( "black-circle.png" );
-	whiteCircle = load_image( "white-circle.png" );
+	//blackCircle = load_image( "black-circle.png" );
+	//whiteCircle = load_image( "white-circle.png" );
+	blackCircle = load_image( "blank-black.png" );
+	whiteCircle = load_image( "blank-white.png" );
+	face = load_image( "happy-white.png" );
+	bowlingBall = load_image( "bowling-ball-black.png" );
 	font = TTF_OpenFont( "Luhyouone.ttf", 72 );
 	TTF_Font* labelFont = TTF_OpenFont( "Luhyouone.ttf", 48 );
 	TTF_Font* livesFont = TTF_OpenFont( "Luhyouone.ttf", 192 );
 	gameTitleText = TTF_RenderText_Solid( font, "Akuragi", blackTextColor );
 	startGameText = TTF_RenderText_Solid( font, "Press 'Enter' to begin", blackTextColor );
 	//startGameText = TTF_RenderText_Solid( font, itos( gameTitleText->h ).c_str() , blackTextColor );
-	pausedText = TTF_RenderText_Solid( font, "Press 'p' or 'enter' to resume", whiteTextColor );
+	pausedText = TTF_RenderText_Solid( labelFont, "Press 'p' or 'enter' to resume", whiteTextColor );
 	SDL_Surface* scoreText = NULL;
 	SDL_Surface* multiplierText = NULL;
 	SDL_Surface* livesText = NULL;
@@ -114,7 +120,7 @@ int main(int arg, char** argv)
 	int previousScore = -1;
 	gameState currentState = INIT;
 
-	Player player( whiteCircle, blackCircle );
+	Player player( face, bowlingBall );
 	EnemyManager enemyManager( whiteCircle, blackCircle, screen );
 
 	int frame = 0;

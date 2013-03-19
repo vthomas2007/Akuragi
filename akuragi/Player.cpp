@@ -190,7 +190,7 @@ void Player::show( SDL_Surface* dest ) const
 	}
 }
 
-void Player::absorbEnemy( GameObject enemy )
+void Player::absorbEnemy( const GameObject& enemy )
 {
 	SDL_Surface* tmpImage = ( enemy.getPolarity() == WHITE ) ? whiteImage : blackImage;
 	playerObjects.push_back( GameObject(tmpImage, enemy.getX(), enemy.getY(), enemy.getXVel(), enemy.getYVel(), enemy.getPolarity() ) );

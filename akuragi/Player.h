@@ -25,7 +25,7 @@ public:
 	void handle_input( const SDL_Event& event );
 	void move();
 	void show( SDL_Surface* dest ) const;
-	void absorbEnemy( GameObject enemy );
+	void absorbEnemy( const GameObject& enemy );
 	void die();
 	void decrementRespawnTimer();
 	void reset();
