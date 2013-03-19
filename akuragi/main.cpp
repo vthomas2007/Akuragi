@@ -18,9 +18,9 @@ using namespace Akuragi::UtilFunctions;
 using namespace Akuragi::Constants;
 
 // TODO: Delete, temporary for debugging
-#include <fstream>
-#include <iostream>
-std::ofstream outputFile( "debug_output.txt", std::ios::out );
+//#include <fstream>
+//#include <iostream>
+//std::ofstream outputFile( "debug_output.txt", std::ios::out );
 
 SDL_Surface *square = NULL;
 SDL_Surface *blackCircle = NULL;
@@ -112,8 +112,6 @@ int main(int arg, char** argv)
 	}
 
 	int previousScore = -1;
-	// Temporary for easier testing, TODO: change initial state back to INIT
-	//gameState currentState = INIT;
 	gameState currentState = ACTIVE;
 
 	Player player( whiteCircle, blackCircle );
@@ -168,14 +166,12 @@ int main(int arg, char** argv)
 					if ( player.getPolarity() == BLACK )
 					{
 						double startPosition = ( musicTimer.get_ticks() / 1000 ) % 240;
-						outputFile << fps.get_ticks() << " " << itos((int)startPosition) << std::endl;
 						Mix_PlayMusic( ikarugaMusic, -1 );
 						Mix_SetMusicPosition( startPosition );
 					}
 					else
 					{
 						double startPosition = ( musicTimer.get_ticks() / 1000 ) % 357;
-						outputFile << fps.get_ticks() << " " << itos((int)startPosition) << std::endl;
 						Mix_PlayMusic( katamariMusic, -1 );
 						Mix_SetMusicPosition( startPosition );
 						//Mix_SetMusicPosition( 60.0f );
@@ -230,12 +226,15 @@ int main(int arg, char** argv)
 				// Draw the score, lives, and multiplier text
 				scoreText = TTF_RenderText_Solid( labelFont, (std::string("Score: ") + itos(player.getScore())).c_str(), blackTextColor );
 				apply_surface( 30, 650, scoreText, screen );
+				SDL_FreeSurface( scoreText );
 
 				multiplierText = TTF_RenderText_Solid( labelFont, (std::string("Multiplier: ") + itos(player.getMultiplier())).c_str(), blackTextColor );
 				apply_surface( 420, 650, multiplierText, screen );
+				SDL_FreeSurface( multiplierText );
 
 				livesText = TTF_RenderText_Solid( livesFont, itos(player.getLives()).c_str(), livesTextColor );
 				apply_surface( 350, 155, livesText, screen );
+				SDL_FreeSurface( livesText );
 
 				// Move the player
 				player.move();
@@ -285,7 +284,6 @@ int main(int arg, char** argv)
         }
 
 		frame++;
-		outputFile << itos(fps.get_ticks()) << std::endl;
 
 		// Cap the frame rate if necessary
 		if ( cap && fps.get_ticks() < 1000 / FRAMES_PER_SECOND )
