@@ -112,7 +112,7 @@ int main(int arg, char** argv)
 	}
 
 	int previousScore = -1;
-	gameState currentState = ACTIVE;
+	gameState currentState = INIT;
 
 	Player player( whiteCircle, blackCircle );
 	EnemyManager enemyManager( whiteCircle, blackCircle, screen );
@@ -120,8 +120,10 @@ int main(int arg, char** argv)
 	int frame = 0;
 	bool cap = true;
 	Timer fps;
+
 	Timer musicTimer;
 	musicTimer.start();
+	bool resetMusic = false; // hackity hack hack
 
 	if ( SDL_Flip( screen ) == -1 )
 	{
@@ -143,9 +145,18 @@ int main(int arg, char** argv)
 				{
 					if ( event.key.keysym.sym == SDLK_RETURN )
 					{
+						// TODO make this suck less
+						if ( resetMusic )
+						{
+							Mix_PlayMusic( katamariMusic, -1 );
+							musicTimer.start();
+							resetMusic = false;
+						}
 						currentState = ACTIVE;
 					}
 				}
+
+
 			}
 			else if ( currentState == ACTIVE )
 			{
@@ -174,7 +185,6 @@ int main(int arg, char** argv)
 						double startPosition = ( musicTimer.get_ticks() / 1000 ) % 357;
 						Mix_PlayMusic( katamariMusic, -1 );
 						Mix_SetMusicPosition( startPosition );
-						//Mix_SetMusicPosition( 60.0f );
 					}
 				}
 			}
@@ -273,6 +283,10 @@ int main(int arg, char** argv)
 		{
 			// Give option to restart the game
 			previousScore = player.getScore();
+			if ( player.getPolarity() == BLACK )
+			{
+				resetMusic = true;
+			}
 			player.reset();
 			currentState = INIT;
 		}
