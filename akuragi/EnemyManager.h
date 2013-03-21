@@ -2,6 +2,7 @@
 #define _ENEMYMANAGER_H_
 
 #include "SDL.h"
+#include "SDL_Mixer.h"
 #include "utility_functions.h"
 #include "Player.h"
 #include <list>
