@@ -10,6 +10,8 @@
 #include "timer.h"
 #include "utility_functions.h"
 #include "constants.h"
+#include "Scene.h"
+#include "SceneDeck.h"
 
 #include <string>
 #include <sstream>
@@ -37,6 +39,12 @@ SDL_Surface *whiteInstructionsButton = NULL;
 SDL_Surface *instructionsButton = NULL;
 SDL_Surface *blackQuitButton = NULL;
 SDL_Surface *whiteQuitButton = NULL;
+SDL_Surface *blackNextButton = NULL;
+SDL_Surface *whiteNextButton = NULL;
+SDL_Surface *blackPrevButton = NULL;
+SDL_Surface *whitePrevButton = NULL;
+SDL_Surface *blackMenuButton = NULL;
+SDL_Surface *whiteMenuButton = NULL;
 SDL_Surface *quitButton = NULL;
 
 SDL_Event event;
@@ -74,6 +82,12 @@ int main(int arg, char** argv)
 	gameTitle = load_image( "title-black.png" );
 	whiteQuitButton = load_image( "quit-white.png" );
 	blackQuitButton = load_image( "quit-black.png" );
+	whiteNextButton = load_image( "next-white.png" );
+	blackNextButton = load_image( "next-black.png" );
+	whitePrevButton = load_image( "previous-white.png" );
+	blackPrevButton = load_image( "previous-black.png" );
+	whiteMenuButton = load_image( "menu-white.png" );
+	blackMenuButton = load_image( "menu-black.png" );
 	quitButton = whiteQuitButton;
 	whiteInstructionsButton = load_image( "instructions-white.png" );
 	blackInstructionsButton = load_image( "instructions-black.png" );
@@ -93,6 +107,12 @@ int main(int arg, char** argv)
 	SDL_Surface* multiplierText = NULL;
 	SDL_Surface* livesText = NULL;
 	SDL_Surface* previousScoreText = NULL;
+
+	SDL_Rect titleBackground;
+	titleBackground.x = 0;
+	titleBackground.y = 160;
+	titleBackground.w = SCREEN_WIDTH;
+	titleBackground.h = 115;
 
 	SDL_Rect leftFrame;
 	leftFrame.x = 0;
@@ -135,6 +155,20 @@ int main(int arg, char** argv)
 
 	Player player( face, bowlingBall );
 	EnemyManager enemyManager( whiteCircle, blackCircle, screen );
+
+	// TEMP: FOR TESTING PURPOSES TODO: delete
+	GameObject* nextButton = new GameObject( whiteNextButton, 500, 500, 0, 0 );
+	GameObject* menuButton = new GameObject( whiteMenuButton, 400, 500, 0, 0 );
+	GameObject* prevButton = new GameObject( whitePrevButton, 250, 500, 0, 0 );
+	SceneDeck instructions( nextButton, menuButton, prevButton );
+	Scene testScene;
+	testScene.addRect( bottomFrame, blackTextColor );
+	testScene.addRect( topFrame, blackTextColor );
+	testScene.addGameObject( whiteCircle, 200, 200 );
+	testScene.addGameObject( blackCircle, 300, 300 );
+	instructions.addScene(testScene);
+	instructions.addScene(testScene);
+	instructions.addScene(testScene);
 
 	int frame = 0;
 	bool cap = true;
@@ -206,7 +240,8 @@ int main(int arg, char** argv)
 					}
 
 				}
-
+				// TEMP, TODO: move/delete
+				instructions.handle_input( event );
 
 			}
 			else if ( currentState == ACTIVE )
@@ -261,8 +296,11 @@ int main(int arg, char** argv)
 		{
 			// Show a menu and stuff here, re-initialize any game variables so that you can
 			// restart the game
+			
 			SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
-			apply_surface( 270, 100, gameTitle, screen );
+			/*
+			SDL_FillRect( screen, &titleBackground, SDL_MapRGB( screen->format, 0x00, 0x00, 0x00 ) );
+			apply_surface( 200, 50, gameTitle, screen );
 			apply_surface( 50, 375, startGameText, screen );
 			apply_surface( INSTRUCTIONS_BUTTON_X, INSTRUCTIONS_BUTTON_Y, instructionsButton, screen );
 			apply_surface( QUIT_BUTTON_X, QUIT_BUTTON_Y, quitButton, screen );
@@ -272,6 +310,8 @@ int main(int arg, char** argv)
 				previousScoreText = TTF_RenderText_Solid( labelFont, (std::string("Previous Score: ") + itos(previousScore)).c_str(), livesTextColor );
 				apply_surface(200, 500, previousScoreText, screen );
 			}
+			*/
+			instructions.show( screen );
 		}
 		else if ( currentState == ACTIVE )
 		{
@@ -369,6 +409,10 @@ int main(int arg, char** argv)
 	}
 
 	//clean_up();
+	delete nextButton;
+	delete menuButton;
+	delete prevButton;
+
 	SDL_FreeSurface( square );
 	SDL_FreeSurface( blackCircle );
 	SDL_FreeSurface( whiteCircle );

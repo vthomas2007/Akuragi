@@ -73,6 +73,8 @@
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneDeck.cpp" />
     <ClCompile Include="square.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="utility_functions.cpp" />
@@ -83,6 +85,8 @@
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneDeck.h" />
     <ClInclude Include="square.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="utility_functions.h" />
