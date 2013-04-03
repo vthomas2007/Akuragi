@@ -31,7 +31,7 @@ namespace Akuragi
 		const int PLAYER_RESPAWN_TIME = 30;
 		const int PLAYER_LIVES = 3; // TODO: Determine if these values should live in Player.h
 
-		enum gameState { INIT, ACTIVE, PAUSED, GAME_OVER };
+		enum gameState { INIT, INSTRUCTIONS, ACTIVE, PAUSED, GAME_OVER };
 
 		// Title screen stuff
 		const int INSTRUCTIONS_BUTTON_X = 200;
@@ -43,5 +43,9 @@ namespace Akuragi
 		const int QUIT_BUTTON_WIDTH = 93;
 		const int QUIT_BUTTON_Y = 550;
 		const int QUIT_BUTTON_HEIGHT = 56;
+
+		// Instructions stuff
+		const int INSTRUCTIONS_HEADING_Y_OFFSET = 50;
+		const int INSTRUCTIONS_NAVIGATION_Y_OFFSET = 600;
 	}
 }

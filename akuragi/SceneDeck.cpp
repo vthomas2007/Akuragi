@@ -1,12 +1,12 @@
 #include "SceneDeck.h"
 
 SceneDeck::SceneDeck()
-	:currentScene(0), prevButton(NULL), nextButton(NULL), menuButton(NULL)
+	:currentScene(0), prevButton(NULL), nextButton(NULL), menuButton(NULL), exit(false)
 {
 }
 
-SceneDeck::SceneDeck( GameObject* nextButton, GameObject* menuButton, GameObject* prevButton )
-	:currentScene(0), nextButton(nextButton), menuButton(menuButton), prevButton(prevButton)
+SceneDeck::SceneDeck( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton )
+	:currentScene(0), prevButton(prevButton), menuButton(menuButton), nextButton(nextButton)
 {
 }
 
@@ -39,12 +39,14 @@ void SceneDeck::back()
 void SceneDeck::reset()
 {
 	currentScene = 0;
+	exit = false;
 }
 
 void SceneDeck::show( SDL_Surface* dest )
 {
 	if ( scenes.size() > 0 && currentScene >= 0 && currentScene < scenes.size() )
 	{
+		SDL_FillRect( dest, &dest->clip_rect, SDL_MapRGB( dest->format, 0xFF, 0xFF, 0xFF ) );
 		scenes[currentScene].show( dest );
 		showNavigation( dest );
 	}
@@ -84,7 +86,7 @@ void SceneDeck::handle_input( SDL_Event& event )
 					  y > (int)menuButton->getY() &&
 					  y < (int)menuButton->getBottomY() )
 			{
-				// TODO: Figure out how to pass back a notification
+				exit = true;
 			}
 
 		}
@@ -105,4 +107,9 @@ void SceneDeck::showNavigation( SDL_Surface* dest )
 	{
 		menuButton->show( dest );
 	}
+}
+
+bool SceneDeck::getExitStatus() const
+{
+	return exit;
 }

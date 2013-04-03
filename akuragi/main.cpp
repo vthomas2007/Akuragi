@@ -47,6 +47,30 @@ SDL_Surface *blackMenuButton = NULL;
 SDL_Surface *whiteMenuButton = NULL;
 SDL_Surface *quitButton = NULL;
 
+// Instructions Surfaces
+SDL_Surface *instControlsHeading;
+SDL_Surface *instArrowKeys;
+SDL_Surface *instSpace;
+
+SDL_Surface *instPolarityHeading;
+SDL_Surface *instDeath1;
+SDL_Surface *instDeath2;
+SDL_Surface *instAbsorb1;
+SDL_Surface *instAbsorb2;
+SDL_Surface *instAbsorb3;
+
+SDL_Surface *instMultiplierHeading;
+SDL_Surface *instMultiplier1;
+SDL_Surface *instMultiplier2;
+SDL_Surface *instMultiplierReset1;
+SDL_Surface *instMultiplierReset2;
+
+SDL_Surface *instTipsHeading;
+SDL_Surface *instBigScore1;
+SDL_Surface *instBigScore2;
+SDL_Surface *instCautionTip1;
+SDL_Surface *instCautionTip2;
+
 SDL_Event event;
 
 TTF_Font *font = NULL;
@@ -98,6 +122,7 @@ int main(int arg, char** argv)
 	bowlingBall = load_image( "bowling-ball-black.png" );
 	font = TTF_OpenFont( "Luhyouone.ttf", 72 );
 	TTF_Font* labelFont = TTF_OpenFont( "Luhyouone.ttf", 48 );
+	TTF_Font* instructionsFont = TTF_OpenFont( "Luhyouone.ttf", 36 );
 	TTF_Font* livesFont = TTF_OpenFont( "Luhyouone.ttf", 192 );
 	//gameTitle = TTF_RenderText_Solid( font, "Akuragi", blackTextColor );
 	startGameText = TTF_RenderText_Solid( font, "Press 'Enter' to begin", blackTextColor );
@@ -145,6 +170,75 @@ int main(int arg, char** argv)
 	bottomFrame.h = PLAYABLE_Y_OFFSET;
 	
 	Uint32 frameColor = SDL_MapRGB( screen->format, 0x00, 0x00, 0x00 );
+
+	// FOR THE LOVE OF GOD WRITE A RESOURCE MANAGER PLEASE
+	GameObject* nextButton = new GameObject( whiteNextButton, 500, INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0, 0 );
+	GameObject* menuButton = new GameObject( whiteMenuButton, 400, INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0, 0 );
+	GameObject* prevButton = new GameObject( whitePrevButton, 250, INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0, 0 );
+	SceneDeck instructions( prevButton, menuButton, nextButton );
+
+	Scene controlsScene;
+	controlsScene.addRect( bottomFrame, blackTextColor );
+	controlsScene.addRect( topFrame, blackTextColor );
+	controlsScene.addRect( rightFrame, blackTextColor );
+	controlsScene.addRect( leftFrame, blackTextColor );
+	instControlsHeading = TTF_RenderText_Solid( labelFont, "Controls", blackTextColor );
+	instArrowKeys = TTF_RenderText_Solid( instructionsFont, "Use the arrow keys to move", blackTextColor );
+	instSpace = TTF_RenderText_Solid( instructionsFont, "Use the space bar to switch polarity", blackTextColor );
+	controlsScene.addGameObject( instControlsHeading, (SCREEN_WIDTH / 2) - (instControlsHeading->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
+	controlsScene.addGameObject( instArrowKeys, (SCREEN_WIDTH / 2) - (instArrowKeys->w / 2), 250 );
+	controlsScene.addGameObject( instSpace, (SCREEN_WIDTH / 2) - (instSpace->w / 2), 350);
+	instructions.addScene( controlsScene );
+
+	Scene polarityScene;
+	polarityScene.addRect( bottomFrame, blackTextColor );
+	polarityScene.addRect( topFrame, blackTextColor );
+	polarityScene.addRect( rightFrame, blackTextColor );
+	polarityScene.addRect( leftFrame, blackTextColor );
+	instPolarityHeading = TTF_RenderText_Solid( labelFont, "Polarity", blackTextColor );
+	instDeath1 = TTF_RenderText_Solid( instructionsFont, "Touching an enemy of opposite polarity will", blackTextColor );
+	instDeath2 = TTF_RenderText_Solid( instructionsFont, "cause you to lose a life", blackTextColor );
+	instAbsorb1 = TTF_RenderText_Solid( instructionsFont, "Touching an emey of the same polarity will", blackTextColor );
+	instAbsorb2 = TTF_RenderText_Solid( instructionsFont, "absorb it, give you points, and increase", blackTextColor );
+	instAbsorb3 = TTF_RenderText_Solid( instructionsFont, " your score multiplier", blackTextColor );
+	polarityScene.addGameObject( instPolarityHeading, (SCREEN_WIDTH / 2) - (instPolarityHeading->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
+	polarityScene.addGameObject( instDeath1, (SCREEN_WIDTH / 2) - (instDeath1->w / 2), 200 );
+	polarityScene.addGameObject( instDeath2, (SCREEN_WIDTH / 2) - (instDeath2->w / 2), 250 );
+	polarityScene.addGameObject( instAbsorb1, (SCREEN_WIDTH / 2) - (instAbsorb1->w / 2), 350 );
+	polarityScene.addGameObject( instAbsorb2, (SCREEN_WIDTH / 2) - (instAbsorb2->w / 2), 400 );
+	polarityScene.addGameObject( instAbsorb3, (SCREEN_WIDTH / 2) - (instAbsorb3->w / 2), 450 );
+	instructions.addScene( polarityScene );
+
+	Scene multiplierScene;
+	multiplierScene.addRect( bottomFrame, blackTextColor );
+	multiplierScene.addRect( topFrame, blackTextColor );
+	multiplierScene.addRect( rightFrame, blackTextColor );
+	multiplierScene.addRect( leftFrame, blackTextColor );
+	instMultiplierHeading = TTF_RenderText_Solid( labelFont, "Score Multiplier", blackTextColor );
+	instMultiplier1 = TTF_RenderText_Solid( instructionsFont, "The bigger your score multiplier, the more", blackTextColor );
+	instMultiplier2 = TTF_RenderText_Solid( instructionsFont, "points you get from absorbing enemies", blackTextColor );
+	instMultiplierReset1 = TTF_RenderText_Solid( instructionsFont, "However, switching polarity resets", blackTextColor );
+	instMultiplierReset2 = TTF_RenderText_Solid( instructionsFont, "your score multiplier", blackTextColor );
+	multiplierScene.addGameObject( instMultiplierHeading, (SCREEN_WIDTH / 2) - (instMultiplierHeading->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
+	multiplierScene.addGameObject( instMultiplier1, (SCREEN_WIDTH / 2) - (instMultiplier1->w / 2), 200 );
+	multiplierScene.addGameObject( instMultiplier2, (SCREEN_WIDTH / 2) - (instMultiplier2->w / 2), 250 );
+	multiplierScene.addGameObject( instMultiplierReset1, (SCREEN_WIDTH / 2) - (instMultiplierReset1->w / 2), 400 );
+	multiplierScene.addGameObject( instMultiplierReset2, (SCREEN_WIDTH / 2) - (instMultiplierReset2->w / 2), 450 );
+	instructions.addScene( multiplierScene );
+
+	Scene tipsScene;
+	tipsScene.addRect( bottomFrame, blackTextColor );
+	tipsScene.addRect( topFrame, blackTextColor );
+	tipsScene.addRect( rightFrame, blackTextColor );
+	tipsScene.addRect( leftFrame, blackTextColor );
+	instTipsHeading = TTF_RenderText_Solid( labelFont, "Pro Tip", blackTextColor );
+	instBigScore1 = TTF_RenderText_Solid( instructionsFont, "To rack up a huge score, only switch", blackTextColor );
+	instBigScore2 = TTF_RenderText_Solid( instructionsFont, "polarity when absolutely necessary!", blackTextColor );
+	tipsScene.addGameObject( instTipsHeading, (SCREEN_WIDTH / 2) - (instTipsHeading->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
+	tipsScene.addGameObject( instBigScore1, (SCREEN_WIDTH / 2) - (instBigScore1->w / 2), 300 );
+	tipsScene.addGameObject( instBigScore2, (SCREEN_WIDTH / 2) - (instBigScore2->w / 2), 350 );
+	instructions.addScene( tipsScene );
+
 	// END TODO
 
 	// Todo: Add checks to ensure resources are present
@@ -155,20 +249,6 @@ int main(int arg, char** argv)
 
 	Player player( face, bowlingBall );
 	EnemyManager enemyManager( whiteCircle, blackCircle, screen );
-
-	// TEMP: FOR TESTING PURPOSES TODO: delete
-	GameObject* nextButton = new GameObject( whiteNextButton, 500, 500, 0, 0 );
-	GameObject* menuButton = new GameObject( whiteMenuButton, 400, 500, 0, 0 );
-	GameObject* prevButton = new GameObject( whitePrevButton, 250, 500, 0, 0 );
-	SceneDeck instructions( nextButton, menuButton, prevButton );
-	Scene testScene;
-	testScene.addRect( bottomFrame, blackTextColor );
-	testScene.addRect( topFrame, blackTextColor );
-	testScene.addGameObject( whiteCircle, 200, 200 );
-	testScene.addGameObject( blackCircle, 300, 300 );
-	instructions.addScene(testScene);
-	instructions.addScene(testScene);
-	instructions.addScene(testScene);
 
 	int frame = 0;
 	bool cap = true;
@@ -208,7 +288,7 @@ int main(int arg, char** argv)
 						currentState = ACTIVE;
 					}
 				}
-				else if ( event.type == SDL_MOUSEMOTION )
+				else if ( event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN )
 				{
 					int x = event.motion.x;
 					int y = event.motion.y;
@@ -219,7 +299,13 @@ int main(int arg, char** argv)
 						 y < INSTRUCTIONS_BUTTON_Y + INSTRUCTIONS_BUTTON_HEIGHT
 						)
 					{
-						instructionsButton = blackInstructionsButton;
+						if ( event.type == SDL_MOUSEMOTION )
+							instructionsButton = blackInstructionsButton;
+						else if ( event.type == SDL_MOUSEBUTTONDOWN )
+						{
+							currentState = INSTRUCTIONS;
+							instructionsButton = whiteInstructionsButton;
+						}
 					}
 					else
 					{
@@ -232,7 +318,10 @@ int main(int arg, char** argv)
 						 y < QUIT_BUTTON_Y + QUIT_BUTTON_HEIGHT
 						)
 					{
-						quitButton = blackQuitButton;
+						if ( event.type == SDL_MOUSEMOTION )
+							quitButton = blackQuitButton;
+						else if ( event.type == SDL_MOUSEBUTTONDOWN )
+							quit = true;
 					}
 					else
 					{
@@ -240,9 +329,15 @@ int main(int arg, char** argv)
 					}
 
 				}
-				// TEMP, TODO: move/delete
+			}
+			else if ( currentState == INSTRUCTIONS )
+			{
 				instructions.handle_input( event );
-
+				if ( instructions.getExitStatus() == true )
+				{
+					instructions.reset();
+					currentState = INIT;
+				}
 			}
 			else if ( currentState == ACTIVE )
 			{
@@ -298,7 +393,6 @@ int main(int arg, char** argv)
 			// restart the game
 			
 			SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
-			/*
 			SDL_FillRect( screen, &titleBackground, SDL_MapRGB( screen->format, 0x00, 0x00, 0x00 ) );
 			apply_surface( 200, 50, gameTitle, screen );
 			apply_surface( 50, 375, startGameText, screen );
@@ -308,9 +402,11 @@ int main(int arg, char** argv)
 			if ( previousScore >= 0 )
 			{
 				previousScoreText = TTF_RenderText_Solid( labelFont, (std::string("Previous Score: ") + itos(previousScore)).c_str(), livesTextColor );
-				apply_surface(200, 500, previousScoreText, screen );
+				apply_surface((SCREEN_WIDTH / 2) - (previousScoreText->w / 2), 650, previousScoreText, screen );
 			}
-			*/
+		}
+		else if ( currentState == INSTRUCTIONS )
+		{
 			instructions.show( screen );
 		}
 		else if ( currentState == ACTIVE )
@@ -413,6 +509,7 @@ int main(int arg, char** argv)
 	delete menuButton;
 	delete prevButton;
 
+	// TODO: WRITE A RESOURCE MANAGER AND FREE ALL YOUR LOOSE SURFACES
 	SDL_FreeSurface( square );
 	SDL_FreeSurface( blackCircle );
 	SDL_FreeSurface( whiteCircle );

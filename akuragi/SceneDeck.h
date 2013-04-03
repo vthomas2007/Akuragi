@@ -8,7 +8,7 @@ class SceneDeck
 {
 public:
 	SceneDeck();
-	SceneDeck( GameObject* nextButton, GameObject* menuButton, GameObject* prevButton );
+	SceneDeck( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton );
 
 	void addScene( Scene scene );
 	void clear();
@@ -17,6 +17,7 @@ public:
 	void reset();
 	void show( SDL_Surface* dest );
 	void handle_input( SDL_Event& event );
+	bool getExitStatus() const;
 
 private:
 	std::vector< Scene > scenes;
@@ -25,6 +26,8 @@ private:
 	GameObject* nextButton;
 	GameObject* menuButton;
 	GameObject* prevButton;
+
+	bool exit;
 
 	void showNavigation( SDL_Surface* dest );
 };

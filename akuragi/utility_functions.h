@@ -7,6 +7,7 @@
 #include <string>
 #include <list>
 #include "GameObject.h"
+#include "SceneDeck.h"
 
 namespace Akuragi
 {
@@ -21,6 +22,7 @@ namespace Akuragi
 		bool check_collision( SDL_Rect A, SDL_Rect B );
 		void clean_up();
 		int ftoi( float f );
+		SceneDeck initalizeInstructions( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton );
 		std::string itos ( int i );
 	}
 }
