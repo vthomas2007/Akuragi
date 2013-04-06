@@ -17,12 +17,12 @@ namespace Akuragi
 		SDL_Surface* init_screen();
 		void apply_surface( int x, int y, SDL_Surface* source, SDL_Surface* destination, SDL_Rect* clip = NULL );
 		SDL_Surface* load_image( std::string filename );
-		//bool load_files();
 		bool check_circular_collision( GameObject A, GameObject B );
 		bool check_collision( SDL_Rect A, SDL_Rect B );
-		void clean_up();
-		int ftoi( float f );
 		SceneDeck initalizeInstructions( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton );
+		//bool load_files();
+		//void clean_up();
+		int ftoi( float f );
 		std::string itos ( int i );
 	}
 }

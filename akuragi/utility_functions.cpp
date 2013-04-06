@@ -5,6 +5,7 @@
 #include <sstream>	// For int to string conversion
 
 using namespace Akuragi::Constants;
+using std::string;
 
 namespace Akuragi
 {
@@ -82,23 +83,6 @@ namespace Akuragi
 				return optimizedImage;
 			}
 		}
-
-		/*
-		bool load_files()
-		{
-			// Load the image
-			square = load_image( "square.bmp" );
-
-			font = TTF_OpenFont( "lazy.ttf", 36 );
-
-			if ( square == NULL || font == NULL )
-			{
-				return false;
-			}
-
-			return true;
-		}
-		*/
 
 		bool check_circular_collision( GameObject A, GameObject B )
 		{
@@ -321,17 +305,6 @@ namespace Akuragi
 
 			return true;
 		}
-		/*
-		void clean_up()
-		{
-			SDL_FreeSurface( square );
-
-			TTF_CloseFont( font );
-			TTF_Quit();
-
-			SDL_Quit();
-		}
-		*/
 
 		SceneDeck initializeInstructions( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton )
 		{
@@ -349,6 +322,28 @@ namespace Akuragi
 
 			return instructions;
 		}
+
+		/*
+		bool load_files()
+		{
+			// Load the image
+			resourceManager.addImage( "title-black", "title-black.png" );
+
+			return true;
+		}
+		*/
+
+		/*
+		void clean_up()
+		{
+			SDL_FreeSurface( square );
+
+			TTF_CloseFont( font );
+			TTF_Quit();
+
+			SDL_Quit();
+		}
+		*/
 
 		int ftoi( float f )
 		{

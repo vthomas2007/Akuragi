@@ -1,4 +1,5 @@
 #include <string>
+#include "ResourceManager.h"
 
 namespace Akuragi
 {

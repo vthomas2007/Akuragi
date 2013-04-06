@@ -3,6 +3,8 @@
 #include "SDL_ttf.h"
 #include "SDL_mixer.h"
 
+#include "resouces.h"
+#include "ResourceManager.h"
 #include "square.h"
 #include "GameObject.h"
 #include "Player.h"
@@ -25,6 +27,7 @@ using namespace Akuragi::Constants;
 //std::ofstream outputFile( "debug_output.txt", std::ios::out );
 
 // For the love of god create a resource manager
+/*
 SDL_Surface *square = NULL;
 SDL_Surface *blackCircle = NULL;
 SDL_Surface *whiteCircle = NULL;
@@ -79,6 +82,7 @@ SDL_Color blackTextColor = { 0, 0, 0 };
 SDL_Color livesTextColor = { 200, 200, 200 };
 SDL_Color whiteTextColor = { 255, 255, 255 };
 
+*/
 
 int main(int arg, char** argv)
 {
@@ -101,9 +105,11 @@ int main(int arg, char** argv)
 	screen = init_screen();
 
 	// This is where "load files" used to be
+	load_files();
 	// TODO: Offload all of this to a resource manager
 	//square = load_image( "square.bmp" );
-	gameTitle = load_image( "title-black.png" );
+	//gameTitle = load_image( "title-black.png" );
+	gameTitle = resourceManager.getImage( "title-black" );
 	whiteQuitButton = load_image( "quit-white.png" );
 	blackQuitButton = load_image( "quit-black.png" );
 	whiteNextButton = load_image( "next-white.png" );
@@ -172,9 +178,9 @@ int main(int arg, char** argv)
 	Uint32 frameColor = SDL_MapRGB( screen->format, 0x00, 0x00, 0x00 );
 
 	// FOR THE LOVE OF GOD WRITE A RESOURCE MANAGER PLEASE
-	GameObject* nextButton = new GameObject( whiteNextButton, 500, INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0, 0 );
-	GameObject* menuButton = new GameObject( whiteMenuButton, 400, INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0, 0 );
-	GameObject* prevButton = new GameObject( whitePrevButton, 250, INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0, 0 );
+	GameObject* nextButton = new GameObject( whiteNextButton, 500.0f, (float)INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0.0f, 0.0f );
+	GameObject* menuButton = new GameObject( whiteMenuButton, 400.0f, (float)INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0.0f, 0.0f );
+	GameObject* prevButton = new GameObject( whitePrevButton, 250.0f, (float)INSTRUCTIONS_NAVIGATION_Y_OFFSET, 0.0f, 0.0f );
 	SceneDeck instructions( prevButton, menuButton, nextButton );
 
 	Scene controlsScene;
@@ -394,7 +400,8 @@ int main(int arg, char** argv)
 			
 			SDL_FillRect( screen, &screen->clip_rect, SDL_MapRGB( screen->format, 0xFF, 0xFF, 0xFF ) );
 			SDL_FillRect( screen, &titleBackground, SDL_MapRGB( screen->format, 0x00, 0x00, 0x00 ) );
-			apply_surface( 200, 50, gameTitle, screen );
+			apply_surface( 200, 50, resourceManager.getImage( "title-black" ), screen );
+			//apply_surface( 200, 50, gameTitle, screen );
 			apply_surface( 50, 375, startGameText, screen );
 			apply_surface( INSTRUCTIONS_BUTTON_X, INSTRUCTIONS_BUTTON_Y, instructionsButton, screen );
 			apply_surface( QUIT_BUTTON_X, QUIT_BUTTON_Y, quitButton, screen );

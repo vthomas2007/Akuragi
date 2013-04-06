@@ -71,8 +71,10 @@
     <ClCompile Include="dot.cpp" />
     <ClCompile Include="EnemyManager.cpp" />
     <ClCompile Include="GameObject.cpp" />
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneDeck.cpp" />
     <ClCompile Include="square.cpp" />
@@ -84,7 +86,11 @@
     <ClInclude Include="dot.h" />
     <ClInclude Include="EnemyManager.h" />
     <ClInclude Include="GameObject.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="logger.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="resouces.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneDeck.h" />
     <ClInclude Include="square.h" />
