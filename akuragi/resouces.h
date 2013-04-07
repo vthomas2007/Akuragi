@@ -17,8 +17,8 @@ void load_images()
 	rm.addImage( "quit-black", "quit-black.png" );
 	rm.addImage( "next-white", "next-white.png" );
 	rm.addImage( "next-black", "next-black.png" );
-	rm.addImage( "previous-white", "previous-white.png" );
-	rm.addImage( "previous-black", "previous-black.png" );
+	rm.addImage( "prev-white", "previous-white.png" );
+	rm.addImage( "prev-black", "previous-black.png" );
 	rm.addImage( "menu-white", "menu-white.png" );
 	rm.addImage( "menu-black", "menu-black.png" );
 	rm.addImage( "instructions-white", "instructions-white.png" );

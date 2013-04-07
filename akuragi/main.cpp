@@ -183,8 +183,8 @@ int main(int arg, char** argv)
 	//instSpace = TTF_RenderText_Solid( instructionsFont, "Use the space bar to switch polarity", blackTextColor );
 	// After all that refactoring and... now I'm calling a map lookup twice per line
 	controlsScene.addGameObject( rm.getText("inst-controls-heading"), (SCREEN_WIDTH / 2) - (rm.getText("inst-controls-heading")->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
-	controlsScene.addGameObject( rm.getText("inst-arrow-keys"),	(SCREEN_WIDTH / 2) - (rm.getText("inst-controls-heading")->w / 2), 250 );
-	controlsScene.addGameObject( rm.getText("inst-space"), (SCREEN_WIDTH / 2) - (rm.getText("inst-controls-heading")->w / 2), 350);
+	controlsScene.addGameObject( rm.getText("inst-arrow-keys"),	(SCREEN_WIDTH / 2) - (rm.getText("inst-arrow-keys")->w / 2), 250 );
+	controlsScene.addGameObject( rm.getText("inst-space"), (SCREEN_WIDTH / 2) - (rm.getText("inst-space")->w / 2), 350);
 	instructions.addScene( controlsScene );
 
 	Scene polarityScene;
@@ -420,7 +420,7 @@ int main(int arg, char** argv)
 				SDL_FillRect( screen, rm.getRect("right-frame"), frameColor );
 				SDL_FillRect( screen, rm.getRect("top-frame"), frameColor );
 				SDL_FillRect( screen, rm.getRect("middle-frame"), frameColor );
-				SDL_FillRect( screen, rm.getRect("right-frame"), frameColor );
+				SDL_FillRect( screen, rm.getRect("bottom-frame"), frameColor );
 
 				// Draw the score, lives, and multiplier text
 				// Todo: See if there's a way to simply update the text portion of this in the resource manager instead of having to keep constructing/destructing the entire
@@ -509,6 +509,7 @@ int main(int arg, char** argv)
 
 	// TODO: WRITE A RESOURCE MANAGER AND FREE ALL YOUR LOOSE SURFACES
 	SDL_FreeSurface( screen );
+	rm.clear();
 	TTF_Quit();
 	SDL_Quit();
 

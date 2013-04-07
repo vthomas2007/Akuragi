@@ -4,13 +4,12 @@
 #include "SDL_ttf.h"
 #include <string>
 #include <unordered_map>
+#include <memory>
 #include "Image.h"
 #include "Color.h"
 #include "Font.h"
 #include "Text.h"
 #include "Rect.h"
-
-
 
 class ResourceManager
 {
@@ -31,10 +30,12 @@ public:
 	SDL_Surface* getText ( const std::string& id );
 	SDL_Rect*	 getRect ( const std::string& id );
 
+	void clear();
+
 private:
-	std::unordered_map< std::string, Image* > images;
-	std::unordered_map< std::string, Color* > colors;
-	std::unordered_map< std::string, Font* > fonts;
-	std::unordered_map< std::string, Text* > text;
-	std::unordered_map< std::string, Rect* > rects;
+	std::unordered_map< std::string, std::shared_ptr<Image> > images;
+	std::unordered_map< std::string, std::shared_ptr<Color> > colors;
+	std::unordered_map< std::string, std::shared_ptr<Font> > fonts;
+	std::unordered_map< std::string, std::shared_ptr<Text> > text;
+	std::unordered_map< std::string, std::shared_ptr<Rect> > rects;
 };

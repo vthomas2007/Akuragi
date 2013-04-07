@@ -4,15 +4,15 @@
 using std::string;
 using std::unordered_map;
 
-typedef unordered_map< string, Image* >::iterator imageIter;
-typedef unordered_map< string, Color* >::iterator colorIter;
-typedef unordered_map< string, Font* >::iterator fontIter;
-typedef unordered_map< string, Text* >::iterator textIter;
-typedef unordered_map< string, Rect* >::iterator rectIter;
+typedef unordered_map< string, std::shared_ptr<Image> >::iterator imageIter;
+typedef unordered_map< string, std::shared_ptr<Color> >::iterator colorIter;
+typedef unordered_map< string, std::shared_ptr<Font> >::iterator fontIter;
+typedef unordered_map< string, std::shared_ptr<Text> >::iterator textIter;
+typedef unordered_map< string, std::shared_ptr<Rect> >::iterator rectIter;
 
 
 ResourceManager::~ResourceManager()
-{
+{/*
 	for ( imageIter iter = images.begin(), end = images.end(); iter != end; iter++ )
 		delete iter->second;
 
@@ -26,33 +26,33 @@ ResourceManager::~ResourceManager()
 		delete iter->second;
 
 	for ( rectIter iter = rects.begin(), end = rects.end(); iter != end; iter++ )
-		delete iter->second;
+		delete iter->second;*/
 }
 
 // TODO: figure out how to template this (absurdly) redundant code
 void ResourceManager::addImage( const string& id, const string& filePath )
 {
-	images[id] = new Image( filePath );
+	images[id].reset(new Image( filePath ) );
 }
 
 void ResourceManager::addColor( const string& id, int r, int g, int b )
 {
-	colors[id] = new Color( r, g, b );
+	colors[id].reset(new Color( r, g, b ) );
 }
 
 void ResourceManager::addFont( const string& id, const string& filePath, int fontSize )
 {
-	fonts[id] = new Font( filePath, fontSize );
+	fonts[id].reset(new Font( filePath, fontSize ) );
 }
 
 void ResourceManager::addText( const string& id, TTF_Font* font, const string& inputText, SDL_Color* color )
 {
-	text[id] = new Text( font, inputText, color );
+	text[id].reset(new Text( font, inputText, color ) );
 }
 
 void ResourceManager::addRect( const string& id, int x, int y, int w, int h )
 {
-	rects[id] = new Rect( x, y, w, h );
+	rects[id].reset(new Rect( x, y, w, h ) );
 }
 
 
@@ -86,5 +86,12 @@ SDL_Rect* ResourceManager::getRect( const string& id )
 	return ( iter != rects.end() ) ? iter->second->get() : NULL;
 }
 
-
+void ResourceManager::clear()
+{
+	images.clear();
+	colors.clear();
+	fonts.clear();
+	text.clear();
+	rects.clear();
+}
 
