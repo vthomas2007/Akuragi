@@ -9,24 +9,12 @@ typedef unordered_map< string, std::shared_ptr<Color> >::iterator colorIter;
 typedef unordered_map< string, std::shared_ptr<Font> >::iterator fontIter;
 typedef unordered_map< string, std::shared_ptr<Text> >::iterator textIter;
 typedef unordered_map< string, std::shared_ptr<Rect> >::iterator rectIter;
+typedef unordered_map< string, std::shared_ptr<Music> >::iterator musicIter;
+typedef unordered_map< string, std::shared_ptr<Sound> >::iterator soundIter;
 
 
 ResourceManager::~ResourceManager()
-{/*
-	for ( imageIter iter = images.begin(), end = images.end(); iter != end; iter++ )
-		delete iter->second;
-
-	for ( colorIter iter = colors.begin(), end = colors.end(); iter != end; iter++ )
-		delete iter->second;
-
-	for ( fontIter iter = fonts.begin(), end = fonts.end(); iter != end; iter++ )
-		delete iter->second;
-
-	for ( textIter iter = text.begin(), end = text.end(); iter != end; iter++ )
-		delete iter->second;
-
-	for ( rectIter iter = rects.begin(), end = rects.end(); iter != end; iter++ )
-		delete iter->second;*/
+{
 }
 
 // TODO: figure out how to template this (absurdly) redundant code
@@ -55,6 +43,15 @@ void ResourceManager::addRect( const string& id, int x, int y, int w, int h )
 	rects[id].reset(new Rect( x, y, w, h ) );
 }
 
+void ResourceManager::addMusic( const string& id, const string& filePath )
+{
+	music[id].reset(new Music( filePath ) );
+}
+
+void ResourceManager::addSound( const string& id, const string& filePath )
+{
+	sounds[id].reset(new Sound( filePath ) );
+}
 
 SDL_Surface* ResourceManager::getImage( const string& id ) 
 {
@@ -86,6 +83,18 @@ SDL_Rect* ResourceManager::getRect( const string& id )
 	return ( iter != rects.end() ) ? iter->second->get() : NULL;
 }
 
+Mix_Music* ResourceManager::getMusic( const string& id )
+{
+	musicIter iter = music.find( id );
+	return ( iter != music.end() ) ? iter->second->get() : NULL;
+}
+
+Mix_Chunk* ResourceManager::getSound( const string& id )
+{
+	soundIter iter = sounds.find( id );
+	return ( iter != sounds.end() ) ? iter->second->get() : NULL;
+}
+
 void ResourceManager::clear()
 {
 	images.clear();
@@ -93,5 +102,8 @@ void ResourceManager::clear()
 	fonts.clear();
 	text.clear();
 	rects.clear();
+	music.clear();
+	sounds.clear();
 }
+
 

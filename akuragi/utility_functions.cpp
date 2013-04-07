@@ -1,5 +1,6 @@
 #include "utility_functions.h"
 #include "constants.h"
+#include "SDL_mixer.h"
 #include <cstdlib>
 #include <ctime>
 #include <sstream>	// For int to string conversion
@@ -25,11 +26,15 @@ namespace Akuragi
 				return false;
 			}
 
+			// Initialize audio subsystems
+			Mix_OpenAudio( 22050, MIX_DEFAULT_FORMAT, 2, 4096 );
+			Mix_VolumeMusic( 127 );
+
 			// Set the window caption
 			SDL_WM_SetCaption( GAME_TITLE.c_str(), NULL );
 
 			// Seed the random number generator
-			srand(time(NULL));
+			srand((unsigned int)time(NULL));
 
 			return true;
 		}
@@ -82,6 +87,7 @@ namespace Akuragi
 
 				return optimizedImage;
 			}
+			return NULL;
 		}
 
 		bool check_circular_collision( GameObject A, GameObject B )
@@ -304,12 +310,6 @@ namespace Akuragi
 			}
 
 			return true;
-		}
-
-		SceneDeck initializeInstructions( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton )
-		{
-			SceneDeck instructions( prevButton, menuButton, nextButton );
-			return instructions;
 		}
 
 		/*

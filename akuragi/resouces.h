@@ -1,6 +1,9 @@
 #pragma once
 
 #include "ResourceManager.h"
+#include "Scene.h"
+#include "SceneDeck.h"
+#include "GameObject.h"
 #include "constants.h"
 
 using namespace Akuragi::Constants;
@@ -31,17 +34,17 @@ void load_images()
 
 void load_colors()
 {
-	rm.addColor( "black", 0, 0, 0 );		// blackTextColor
-	rm.addColor( "gray" , 200, 200, 200 );  // livesTextColor
-	rm.addColor( "white", 255, 255, 255 );	// whiteTextColor
+	rm.addColor( "black", 0, 0, 0 );
+	rm.addColor( "gray" , 200, 200, 200 );
+	rm.addColor( "white", 255, 255, 255 );
 }
 
 void load_fonts()
 {
-	rm.addFont( "huge"  , "Luhyouone.ttf", 192 ); // livesFont
-	rm.addFont( "big"   , "Luhyouone.ttf", 72 );  // font
-	rm.addFont( "medium", "Luhyouone.ttf", 48 );  // labelFont
-	rm.addFont( "small" , "Luhyouone.ttf", 36 );  // instructionsFont
+	rm.addFont( "huge"  , "Luhyouone.ttf", 192 );
+	rm.addFont( "big"   , "Luhyouone.ttf", 72 );
+	rm.addFont( "medium", "Luhyouone.ttf", 48 );
+	rm.addFont( "small" , "Luhyouone.ttf", 36 );
 }
 
 void load_text()
@@ -74,13 +77,27 @@ void load_text()
 
 void load_rects()
 {
-	//rm.addRect( "" ); // 
-	rm.addRect( "title-background", 0, 160, SCREEN_WIDTH, 115 ); // titleBackground
-	rm.addRect( "left-frame", 0, 0, PLAYABLE_X_OFFSET, SCREEN_HEIGHT ); // leftFrame
-	rm.addRect( "right-frame", SCREEN_WIDTH - PLAYABLE_X_OFFSET, 0, PLAYABLE_X_OFFSET, SCREEN_HEIGHT ); // rightFrame
-	rm.addRect( "top-frame", PLAYABLE_X_OFFSET, 0, PLAYABLE_WIDTH, PLAYABLE_Y_OFFSET ); // topFrame
-	rm.addRect( "middle-frame", PLAYABLE_X_OFFSET, PLAYABLE_Y_OFFSET + PLAYABLE_HEIGHT, PLAYABLE_WIDTH, PLAYABLE_X_OFFSET ); // middleFrame
-	rm.addRect( "bottom-frame", PLAYABLE_X_OFFSET, SCREEN_HEIGHT - PLAYABLE_Y_OFFSET, PLAYABLE_WIDTH, PLAYABLE_Y_OFFSET ); // bottomFrame
+	rm.addRect( "title-background", 0, 160, SCREEN_WIDTH, 115 );
+	rm.addRect( "left-frame", 0, 0, PLAYABLE_X_OFFSET, SCREEN_HEIGHT );
+	rm.addRect( "right-frame", SCREEN_WIDTH - PLAYABLE_X_OFFSET, 0, PLAYABLE_X_OFFSET, SCREEN_HEIGHT );
+	rm.addRect( "top-frame", PLAYABLE_X_OFFSET, 0, PLAYABLE_WIDTH, PLAYABLE_Y_OFFSET );
+	rm.addRect( "middle-frame", PLAYABLE_X_OFFSET, PLAYABLE_Y_OFFSET + PLAYABLE_HEIGHT, PLAYABLE_WIDTH, PLAYABLE_X_OFFSET );
+	rm.addRect( "bottom-frame", PLAYABLE_X_OFFSET, SCREEN_HEIGHT - PLAYABLE_Y_OFFSET, PLAYABLE_WIDTH, PLAYABLE_Y_OFFSET );
+}
+
+void load_music()
+{
+	rm.addMusic( "katamari", "music1.ogg" );
+	rm.addMusic( "ikaruga", "music2.ogg" );
+	//Mix_Music* katamariMusic = Mix_LoadMUS( "music1.ogg" );
+	//Mix_Music* ikarugaMusic = Mix_LoadMUS( "music2.ogg" );
+
+}
+
+void load_sounds()
+{
+	//Mix_Chunk *gameOverSound = Mix_LoadWAV( "gameover.wav" );
+	rm.addSound( "dead", "dead.wav" );
 }
 
 void load_files()
@@ -90,6 +107,60 @@ void load_files()
 	load_fonts();
 	load_text();
 	load_rects();
+	load_music();
+	load_sounds();
 	//quitButton              = whiteQuitButton;
 	//instructionsButton = whiteInstructionsButton;
+}
+
+SceneDeck initializeInstructions( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton )
+{
+	SceneDeck instructions( prevButton, menuButton, nextButton );
+
+	Scene controlsScene;
+	controlsScene.addRect( rm.getRect("bottom-frame"), rm.getColor("black") );
+	controlsScene.addRect( rm.getRect("top-frame"), rm.getColor("black") );
+	controlsScene.addRect( rm.getRect("left-frame"), rm.getColor("black") );
+	controlsScene.addRect( rm.getRect("right-frame"), rm.getColor("black") );
+	controlsScene.addGameObject( rm.getText("inst-controls-heading"), (SCREEN_WIDTH / 2) - (rm.getText("inst-controls-heading")->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
+	controlsScene.addGameObject( rm.getText("inst-arrow-keys"),	(SCREEN_WIDTH / 2) - (rm.getText("inst-arrow-keys")->w / 2), 250 );
+	controlsScene.addGameObject( rm.getText("inst-space"), (SCREEN_WIDTH / 2) - (rm.getText("inst-space")->w / 2), 350);
+	instructions.addScene( controlsScene );
+
+	Scene polarityScene;
+	polarityScene.addRect( rm.getRect("bottom-frame"), rm.getColor("black") );
+	polarityScene.addRect( rm.getRect("top-frame"), rm.getColor("black") );
+	polarityScene.addRect( rm.getRect("left-frame"), rm.getColor("black") );
+	polarityScene.addRect( rm.getRect("right-frame"), rm.getColor("black") );
+	polarityScene.addGameObject( rm.getText("inst-polarity-heading"), (SCREEN_WIDTH / 2) - (rm.getText("inst-controls-heading")->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
+	polarityScene.addGameObject( rm.getText("inst-death-1"), (SCREEN_WIDTH / 2) - (rm.getText("inst-death-1")->w / 2), 200 );
+	polarityScene.addGameObject( rm.getText("inst-death-2"), (SCREEN_WIDTH / 2) - (rm.getText("inst-death-2")->w / 2), 250 );
+	polarityScene.addGameObject( rm.getText("inst-absorb-1"), (SCREEN_WIDTH / 2) - (rm.getText("inst-absorb-1")->w / 2), 350 );
+	polarityScene.addGameObject( rm.getText("inst-absorb-2"), (SCREEN_WIDTH / 2) - (rm.getText("inst-absorb-2")->w / 2), 400 );
+	polarityScene.addGameObject( rm.getText("inst-absorb-3"), (SCREEN_WIDTH / 2) - (rm.getText("inst-absorb-3")->w / 2), 450 );
+	instructions.addScene( polarityScene );
+
+	Scene multiplierScene;
+	multiplierScene.addRect( rm.getRect("bottom-frame"), rm.getColor("black") );
+	multiplierScene.addRect( rm.getRect("top-frame"), rm.getColor("black") );
+	multiplierScene.addRect( rm.getRect("left-frame"), rm.getColor("black") );
+	multiplierScene.addRect( rm.getRect("right-frame"), rm.getColor("black") );
+	multiplierScene.addGameObject( rm.getText("inst-multiplier-heading"), (SCREEN_WIDTH / 2) - (rm.getText("inst-multiplier-heading")->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
+	multiplierScene.addGameObject( rm.getText("inst-multiplier-1"), (SCREEN_WIDTH / 2) - (rm.getText("inst-multiplier-1")->w / 2), 200 );
+	multiplierScene.addGameObject( rm.getText("inst-multiplier-2"), (SCREEN_WIDTH / 2) - (rm.getText("inst-multiplier-2")->w / 2), 250 );
+	multiplierScene.addGameObject( rm.getText("inst-multiplier-reset-1"), (SCREEN_WIDTH / 2) - (rm.getText("inst-multiplier-reset-1")->w / 2), 400 );
+	multiplierScene.addGameObject( rm.getText("inst-multiplier-reset-2"), (SCREEN_WIDTH / 2) - (rm.getText("inst-multiplier-reset-2")->w / 2), 450 );
+	instructions.addScene( multiplierScene );
+
+	Scene tipsScene;
+	tipsScene.addRect( rm.getRect("bottom-frame"), rm.getColor("black") );
+	tipsScene.addRect( rm.getRect("top-frame"), rm.getColor("black") );
+	tipsScene.addRect( rm.getRect("left-frame"), rm.getColor("black") );
+	tipsScene.addRect( rm.getRect("right-frame"), rm.getColor("black") );
+	tipsScene.addGameObject( rm.getText("inst-tips-heading"), (SCREEN_WIDTH / 2) - (rm.getText("inst-tips-heading")->w / 2), INSTRUCTIONS_HEADING_Y_OFFSET );
+	tipsScene.addGameObject( rm.getText("inst-big-score-1"), (SCREEN_WIDTH / 2) - (rm.getText("inst-big-score-1")->w / 2), 300 );
+	tipsScene.addGameObject( rm.getText("inst-big-score-2"), (SCREEN_WIDTH / 2) - (rm.getText("inst-big-score-2")->w / 2), 350 );
+	instructions.addScene( tipsScene );
+
+	return instructions;
 }

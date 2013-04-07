@@ -19,8 +19,6 @@ namespace Akuragi
 		SDL_Surface* load_image( std::string filename );
 		bool check_circular_collision( GameObject A, GameObject B );
 		bool check_collision( SDL_Rect A, SDL_Rect B );
-		SceneDeck initalizeInstructions( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton );
-		//bool load_files();
 		//void clean_up();
 		int ftoi( float f );
 		std::string itos ( int i );
