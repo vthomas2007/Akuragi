@@ -68,32 +68,40 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Color.cpp" />
     <ClCompile Include="dot.cpp" />
     <ClCompile Include="EnemyManager.cpp" />
+    <ClCompile Include="Font.cpp" />
     <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="Rect.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneDeck.cpp" />
     <ClCompile Include="square.cpp" />
+    <ClCompile Include="Text.cpp" />
     <ClCompile Include="timer.cpp" />
     <ClCompile Include="utility_functions.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Color.h" />
     <ClInclude Include="constants.h" />
     <ClInclude Include="dot.h" />
     <ClInclude Include="EnemyManager.h" />
+    <ClInclude Include="Font.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="Rect.h" />
     <ClInclude Include="resouces.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneDeck.h" />
     <ClInclude Include="square.h" />
+    <ClInclude Include="Text.h" />
     <ClInclude Include="timer.h" />
     <ClInclude Include="utility_functions.h" />
   </ItemGroup>

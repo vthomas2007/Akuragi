@@ -309,17 +309,6 @@ namespace Akuragi
 		SceneDeck initializeInstructions( GameObject* prevButton, GameObject* menuButton, GameObject* nextButton )
 		{
 			SceneDeck instructions( prevButton, menuButton, nextButton );
-
-			// Scene to explain controls
-			Scene controlsScene;
-
-
-			Scene polarityScene;
-
-			Scene multiplierScene;
-
-			Scene tipsScene;
-
 			return instructions;
 		}
 

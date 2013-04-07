@@ -17,7 +17,7 @@ Image::~Image()
 	SDL_FreeSurface( image );
 }
 
-SDL_Surface* Image::get() const
+SDL_Surface* Image::get()
 {
 	return image;
 }

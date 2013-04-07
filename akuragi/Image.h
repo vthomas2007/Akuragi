@@ -10,7 +10,7 @@ public:
 	Image( const std::string& filePath );
 	~Image();
 
-	SDL_Surface* get() const;
+	SDL_Surface* get();
 
 private:
 	SDL_Surface* image;
