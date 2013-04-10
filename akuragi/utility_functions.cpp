@@ -90,7 +90,7 @@ namespace Akuragi
 			return NULL;
 		}
 
-		bool check_circular_collision( GameObject A, GameObject B )
+		bool check_circular_collision( const GameObject& A, const GameObject& B )
 		{
 			//Initialize temporary variables to calculate the "center" of the object... may need to revisit class structure later
 			float AhalfWidth = (float)(A.getImage()->w / 2);
